@@ -1,8 +1,9 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const express = require("express");
-const userRoute = require("./routes/userRoute");
+dotenv.config();
 const app = express();
-
+const userRoute = require("./routes/userRoute");
 app.use(express.json({ limit: "10kb" }));
 app.use("/api/v1/user", userRoute);
 

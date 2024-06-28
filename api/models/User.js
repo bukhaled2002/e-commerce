@@ -46,6 +46,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enums: ["admin", "vendor", "customer"],
+      default: "customer",
     },
     wishList: [
       {
@@ -64,7 +65,7 @@ const userSchema = new mongoose.Schema(
 );
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password);
+  this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
   next();
 });
