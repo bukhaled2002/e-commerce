@@ -58,7 +58,6 @@ const userSchema = new mongoose.Schema(
     },
     location: String,
     points: Number,
-    reviews: [{ type: mongoose.Schema.ObjectId, ref: "Review" }],
   },
   { timestamps: true }
 );

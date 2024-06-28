@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-productSchema = new mongoose.Schema(
+const productSchema = new mongoose.Schema(
   {
     name: {
       type: Sting,
@@ -42,3 +42,5 @@ productSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+const Product = mongoose.model("Product", productSchema);
+module.exports = Product;

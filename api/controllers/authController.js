@@ -82,4 +82,15 @@ exports.protect = async (req, res, next) => {
       new AppError("User recently changed password! please log in again")
     );
   req.user = currentUser;
+  next();
 };
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("you don't have the permision to perform this actions.")
+      );
+      next();
+    }
+  };
