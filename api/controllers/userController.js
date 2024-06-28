@@ -1,3 +1,4 @@
+const Order = require("../models/Order");
 const User = require("../models/User");
 
 exports.getAllVendors = async (req, res, next) => {
@@ -27,4 +28,9 @@ exports.deleteCustomer = async (req, res, next) => {
   await User.findByIdAndDelete(req.params.customerId);
   res.status(200).json({ status: "deleted successfully" });
 };
-exports.getCustomersOfVendor = async () => {};
+exports.getCustomersOfVendor = async (req, res, next) => {
+  const customers = await User.find({
+    _id: await Order.distinct("customer", { vendor: req.params.vendorId }),
+  });
+  return customers;
+};

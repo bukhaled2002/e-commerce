@@ -29,7 +29,7 @@ const createSendToken = (user, statusCode, res) => {
     user.password = undefined;
     res.status(statusCode).json({ status: "success", token, data: { user } });
   } catch (error) {
-    next(new AppError(404, error));
+    res.status(404).json({ error: error });
   }
 };
 exports.signup = async (req, res, next) => {
