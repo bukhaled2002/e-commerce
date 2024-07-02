@@ -2,14 +2,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
+    name: {
       type: String,
-      required: [true, "please provide first name"],
-      minlength: [2, "please provide valid name"],
-    },
-    lastName: {
-      type: String,
-      required: [true, "please provide last name"],
+      required: [true, "please provide name"],
       minlength: [2, "please provide valid name"],
     },
     email: {
@@ -45,7 +40,7 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enums: ["admin", "vendor", "customer"],
+      enum: ["admin", "vendor", "customer"],
       default: "customer",
     },
     wishList: [
@@ -58,8 +53,8 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "Product",
     },
-    location: String,
     points: Number,
+    active: { type: Boolean, default: true },
   },
   { timestamps: true }
 );
@@ -67,6 +62,7 @@ userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   this.passwordConfirm = undefined;
+
   next();
 });
 userSchema.pre("save", async function (next) {
@@ -74,13 +70,23 @@ userSchema.pre("save", async function (next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
+userSchema.pre(/^find/, function (next) {
+  this.select("-password");
+  next();
+});
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 userSchema.methods.correctPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-userSchema.methods.changedPasswordAfter = async function (JWTTimestamp) {
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   let changedTimestamp;
   if (this.passwordChangedAt) {
     changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    console.log(this.passwordChangedAt);
     return JWTTimestamp < changedTimestamp;
   }
   return false;

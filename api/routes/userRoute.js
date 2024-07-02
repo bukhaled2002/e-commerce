@@ -13,21 +13,31 @@ const {
   getAllCustomers,
   getOneCustomer,
   deleteCustomer,
+  updateMe,
+  getMe,
+  deleteMe,
+  getAllUsers,
 } = require("../controllers/userController");
 const router = Router();
+const productRouter = require("../routes/productRoute");
 // authentication
 router.post("/signup", signup);
 router.post("/signin", signin);
 
 // dashboard purpose
+router.route("/updateMe").post(protect, updateMe);
+router.route("/getMe").get(protect, getMe);
+router.route("/deleteMe").delete(protect, deleteMe);
+router.route("/").get(getAllUsers);
 
-router.use("/vendor", protect, restrictTo("admin"));
+router.use("/vendor/:vendorId/product", protect, productRouter);
 
+router.use("/vendor", protect);
 router.route("/vendor").get(getAllVendors);
-router.route("/vendor/:vendorID").get(getOneVendor).delete(deleteVendor);
+router.route("/vendor/:vendorId").get(getOneVendor).delete(deleteVendor);
 
-router.use("/customer", protect, restrictTo("admin"));
-
+router.use("/customer", protect);
+router.use("customer/:customerId/product", productRouter);
 router.route("/customer").get(getAllCustomers);
 router
   .route("/customer/:customerId")

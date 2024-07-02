@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema(
   {
     name: {
-      type: Sting,
+      type: String,
       required: [true, "please provide the name of product"],
       minLength: [5, "must have more than 5 charachter"],
-      minLength: [30, "must have less than 30 charachters"],
+      maxLength: [30, "must have less than 30 charachters"],
     },
     category: {
       type: String,
@@ -17,14 +17,11 @@ const productSchema = new mongoose.Schema(
       required: [true, "product must have description"],
       minLength: [10, "description must be more than 10 charachters"],
     },
-    tages: [String],
-    vendor: {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
+    tags: [String],
     images: [String],
     price: {
       type: Number,
+      required: [true, "you must provide price"],
       min: 1,
       max: 100000,
     },

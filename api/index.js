@@ -4,8 +4,11 @@ const express = require("express");
 dotenv.config();
 const app = express();
 const userRoute = require("./routes/userRoute");
+const productRoute = require("./routes/productRoute");
+const AppError = require("./utils/AppError");
 app.use(express.json({ limit: "10kb" }));
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/product", productRoute);
 
 app.all("*", (req, res, next) => {
   const error = new AppError(
