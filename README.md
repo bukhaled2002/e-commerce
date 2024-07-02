@@ -79,26 +79,27 @@ COMMENT
 <!-- END POINTS -->
 
 VENDOR:
-/signin
-/signup
-/update
+/signin //Done
+/signup //Done
+/update //Done
 /forgotPassword
 /resetPassword
-/createProduct
-/deleteProduct
-/updateProduct
+/createProduct //Done
+/deleteProduct //Done
+/updateProduct //Done
 (GET)vendor/monthly-stats/:month - (with providing chart)
 (GET)vendor/monthly-stats/:product/:month - (with providing chart)
 
 COSTUMER:
-/signin
-/signup
-/update
+/signin //Done
+/signup //Done
+/update //Done
 /forgotPassword
 /resetPassword
-(GET)/PRODUCTS/?CATEGORY="SS"&bBLAVLA="sasa"
-(POST)/Wishlist
-(GET)/Wishlist
+(GET)/PRODUCTS/?CATEGORY="SS"&bBLAVLA="sasa" 1/2 Done
+(POST)/Wishlist //Done
+(GET)/Wishlist //Done
+(DELETE)/Wishlist //Done
 (GET)/weeklyTrends - (get moslty purchaced in the last 7 days)
 (GET)/specialOffers - (get products with discounts)
 
@@ -118,9 +119,9 @@ BLOGS:
 (PATCH)/blogs/:blogId/comments/:commentId
 
 PRODUCTS:
-(GET)/products
-(POST)/products
-(PATCH)/products/:productId
+(GET)/products //Done
+(POST)/products //Done
+(PATCH)/products/:productId //Done
 
 REVIEWS:
 (GET)/products/:productID/reviews
@@ -141,8 +142,8 @@ DASHBOARD
 
 <!--  -->
 
-(GET)/customers
-(GET)/customers/:customerId - (products buyed and reviews on it and total points )
+(GET)/customers //Done
+(GET)/customers/:customerId - (products buyed and reviews on it and total points ) //Done
 
 <!-- for security -->
 
