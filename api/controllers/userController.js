@@ -64,8 +64,11 @@ exports.getMe = async (req, res, next) => {
 exports.deleteMe = async (req, res, next) => {
   try {
     await User.findByIdAndDelete(req.user.id);
+    res
+      .status(202)
+      .json({ status: "success", message: "deleted successfully" });
   } catch (error) {
-    res.status(403).json({ status: "fail", message: "failed to update" });
+    res.status(403).json({ status: "fail", message: "failed to delete" });
   }
 };
 exports.getAllVendors = async (req, res, next) => {
@@ -77,11 +80,13 @@ exports.getAllVendors = async (req, res, next) => {
   }
 };
 exports.getOneVendor = async (req, res, next) => {
+  console.log(req.params.vendorId);
   try {
     const vendor = await User.find({
       role: "vendor",
-      id: req.params.vendorId,
+      _id: req.params.vendorId,
     });
+    console.log(vendor);
     if (vendor.length === 0) {
       return res
         .status(400)
@@ -116,7 +121,7 @@ exports.getOneCustomer = async (req, res, next) => {
   try {
     const customer = await User.find({
       role: "customer",
-      id: req.params.customerId,
+      _id: req.params.customerId,
     });
     if (customer.length === 0) {
       return (

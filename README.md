@@ -1,4 +1,4 @@
-VENDOR:
+<!-- VENDOR:
 First Name
 Last Name
 Email
@@ -74,7 +74,7 @@ REVIEW:
 Costumer: COSTUMER_ID
 PRODUCT: PRODUCT_ID
 RATING: [1-5]
-COMMENT
+COMMENT -->
 
 <!-- END POINTS -->
 

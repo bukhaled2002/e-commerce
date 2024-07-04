@@ -56,7 +56,11 @@ const userSchema = new mongoose.Schema(
     points: Number,
     active: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -70,17 +74,18 @@ userSchema.pre("save", async function (next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
-userSchema.pre(/^find/, function (next) {
-  this.select("-password");
-  next();
-});
+// userSchema.pre(/^find/, function (next) {
+//   t
+//   next();
+// });
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
   next();
 });
 
-userSchema.methods.correctPassword = async function (password) {
-  return await bcrypt.compare(password, this.password);
+userSchema.methods.correctPassword = async function (password, dbPassword) {
+  console.log(password, dbPassword);
+  return await bcrypt.compare(password, dbPassword);
 };
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   let changedTimestamp;

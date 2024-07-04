@@ -4,6 +4,29 @@ const User = require("../models/User");
 exports.setVendor = (req, res, next) => {
   if (!req.body.vendor) req.body.vendor = req.params.vendorId;
 
+  if (req.body.vendor !== req.user?.id) {
+  }
+  return res
+    .status(404)
+    .json({ message: "not allowed to change others products" });
+
+  next();
+};
+exports.allowVendorToChangeProducts = (req, res, next) => {
+  if (req.user?.role === "admin") req.body.vendor = req.user?.id;
+  console.log(req.body.vendor, req.user.id);
+  if (req.body.vendor !== req.user?.id) {
+    return res
+      .status(404)
+      .json({ message: "not allowed to change others products" });
+  }
+
+  next();
+};
+exports.setCustomerAndProduct = (req, res, next) => {
+  if (!req.body.customer) req.body.customer = req.params.customerId;
+  if (!req.body.product) req.body.product = req.params.productId;
+
   next();
 };
 exports.getAllProducts = async (req, res, next) => {
@@ -28,7 +51,6 @@ exports.getAllProducts = async (req, res, next) => {
 exports.getOneProduct = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.productId);
-    console.log(product);
     return res.status(200).json({ status: "success", data: product });
   } catch (error) {
     return res
@@ -38,14 +60,9 @@ exports.getOneProduct = async (req, res, next) => {
 };
 
 exports.createProduct = async (req, res, next) => {
-  if (req.body.vendor !== req.user?.id) {
-    return res
-      .status(404)
-      .json({ message: "not allowed to change others products" });
-  }
   try {
     const product = await Product.create(req.body);
-    res.status(201).json({
+    return res.status(201).json({
       status: "success",
       message: "product added successfully",
       product,
@@ -63,29 +80,24 @@ exports.updateProduct = async (req, res, next) => {
       req.body,
       { new: true, runValidators: true }
     );
+    if (!productUpdated) {
+      return res
+        .status(405)
+        .json({ status: "fail", message: "cannot change product" });
+    }
     res.status(202).json({
       status: "success",
       message: "product updated successfully",
       productUpdated,
     });
   } catch (error) {
-    console.log(error);
+    return res.status(404).json("ssss");
   }
 };
-exports.allowVendorToChangeProducts = (req, res, next) => {
-  if (req.user?.role === "admin") {
-    next();
-  }
-  if (req.body.vendor !== req.user?.id) {
-    return res
-      .status(404)
-      .json({ message: "not allowed to change others products" });
-  }
-  next();
-};
+
 exports.deleteProduct = async (req, res, next) => {
   try {
-    await Product.findByIdAndDelete(req.params.productId);
+    await Product.findByIdAndDelete(req.body.product);
     res.status(202).json({ message: "successfully deleted" });
   } catch (error) {
     return res.status(404).json({ message: "item not found" });
@@ -93,10 +105,12 @@ exports.deleteProduct = async (req, res, next) => {
 };
 exports.getWishlist = async (req, res, next) => {
   try {
-    if (!req.params.customerId) req.params.customerId = req.user.id;
-    const { wishList } = await User.findById(req.params.customerId).select(
-      "wishList"
-    );
+    if (!req.body.customer) req.body.customer = req.params.customerId;
+    const { wishList } = await User.findById(req.body.customer).populate({
+      path: "wishList",
+    });
+
+    console.log(wishList);
     res.status(200).json({
       status: "success",
       message: "wishList retrieved successfully",
@@ -119,40 +133,28 @@ exports.getWishlist = async (req, res, next) => {
 //           });
 //         }
 // }
+
 exports.addToWishlist = async (req, res, next) => {
   try {
-    if (!req.params.customerId) req.params.customerId = req.user.id;
-    if (!req.params.productId) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Product ID is required",
-      });
-    }
-
     const result = await User.updateOne(
       {
-        _id: req.params.customerId,
-        wishList: { $not: { $in: [req.params.productId] } },
+        _id: req.body.customer,
+        wishList: { $not: { $in: [req.body.product] } },
       },
-      { $addToSet: { wishList: req.params.productId } },
+      { $addToSet: { wishList: req.body.product } },
       { new: true, runValidators: true }
     );
-
+    console.log(result);
     if (result.modifiedCount === 1) {
       return res.status(200).json({
         status: "success",
         message: "Wishlist added successfully",
         wishList: req.params.productId,
       });
-    } else if (result.matchedCount === 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found",
-      });
     } else {
       return res.status(400).json({
         status: "fail",
-        message: "Product already in wishlist",
+        message: "cannot add product to wishlist",
       });
     }
   } catch (error) {
@@ -166,20 +168,12 @@ exports.addToWishlist = async (req, res, next) => {
 };
 exports.removeFromWishlist = async (req, res, next) => {
   try {
-    if (!req.params.customerId) req.params.customerId = req.user.id;
-    if (!req.params.productId) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Product ID is required",
-      });
-    }
-
     const result = await User.updateOne(
       {
-        _id: req.params.customerId,
-        wishList: { $in: [req.params.productId] },
+        _id: req.body.customer,
+        wishList: { $in: [req.body.product] },
       },
-      { $pull: { wishList: req.params.productId } },
+      { $pull: { wishList: req.body.product } },
       { new: true, runValidators: true }
     );
 

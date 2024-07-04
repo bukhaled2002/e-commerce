@@ -55,7 +55,10 @@ exports.signin = async (req, res, next) => {
       return next(new AppError("please provide email and password"));
     }
     const user = await User.findOne({ email }).select("+password");
-    if (!user || !user.correctPassword(password)) {
+    console.log(user.password);
+    // const user = await User.findOne({ email });
+
+    if (!user || !(await user.correctPassword(password, user.password))) {
       return next(new AppError("incorrect credintials"));
     }
     createSendToken(user, 200, res);
@@ -93,10 +96,11 @@ exports.protect = async (req, res, next) => {
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
+    console.log(roles.includes(req.user.role));
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError("you don't have the permision to perform this actions.")
       );
-      next();
     }
+    next();
   };
