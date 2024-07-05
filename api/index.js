@@ -3,10 +3,22 @@ const dotenv = require("dotenv");
 const express = require("express");
 dotenv.config();
 const app = express();
+const socketIo = require("socket.io");
+const http = require("http");
+
 const userRoute = require("./routes/userRoute");
 const productRoute = require("./routes/productRoute");
 const reviewRoute = require("./routes/reviewRoute");
 const AppError = require("./utils/AppError");
+const blogSocket = require("./socket/blogSocket");
+const commentSocket = require("./socket/commentSocket");
+
+// set Socket.io event listners
+const server = http.createServer(app);
+const io = socketIo(server);
+blogSocket(io);
+commentSocket(io);
+// set routes and middleware
 app.use(express.json({ limit: "10kb" }));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", productRoute);

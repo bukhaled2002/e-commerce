@@ -124,9 +124,9 @@ PRODUCTS:
 (PATCH)/products/:productId //Done
 
 REVIEWS:
-(GET)/products/:productID/reviews
-(POST)/products/:productID/reviews
-(PATCH)/products/:productID/reviews/:reveiwId
+(GET)/products/:productID/reviews //Done
+(POST)/products/:productID/reviews //Done
+(PATCH)/products/:productID/reviews/:reveiwId //Done
 
 DASHBOARD
 

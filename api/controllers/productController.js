@@ -5,10 +5,10 @@ exports.setVendor = (req, res, next) => {
   if (!req.body.vendor) req.body.vendor = req.params.vendorId;
 
   if (req.body.vendor !== req.user?.id) {
+    return res
+      .status(404)
+      .json({ message: "not allowed to change others products" });
   }
-  return res
-    .status(404)
-    .json({ message: "not allowed to change others products" });
 
   next();
 };

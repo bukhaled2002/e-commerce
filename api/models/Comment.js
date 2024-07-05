@@ -5,6 +5,11 @@ const commentSchema = new mongoose.Schema({
     ref: "User",
     required: [true, "no comment can be done without writer"],
   },
+  blog: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+    required: [true, "you must identify a blog"],
+  },
   text: {
     type: String,
     required: [true, "no comment can be added without text"],

@@ -1,9 +1,12 @@
 const mongoose = require("mongoose");
 const blogSchema = new mongoose.Schema({
-  writer: { type: mongoose.Schema.ObjectId, ref: "User" },
+  writer: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
   images: [{ type: String }],
-  Likes: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
-  comments: [{ type: mongoose.Schema.ObjectId, ref: "Comment" }],
+  likes: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
 });
-const Blog = mongoose.model("Model", blogSchema);
+const Blog = mongoose.model("Blog", blogSchema);
+
 module.exports = Blog;
