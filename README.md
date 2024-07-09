@@ -108,10 +108,8 @@ BLOGS:
 <!-- get all blogs -->
 
 (GET)/blogs
-
-<!-- add blog -->
-
 (POST)/blogs
+
 (GET)/blogs/:blogId
 (PATCH)/blogs/:blogId
 (GET)/blogs/:blogId/comments

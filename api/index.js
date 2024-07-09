@@ -16,8 +16,10 @@ const commentSocket = require("./socket/commentSocket");
 // set Socket.io event listners
 const server = http.createServer(app);
 const io = socketIo(server);
+
 blogSocket(io);
 commentSocket(io);
+
 // set routes and middleware
 app.use(express.json({ limit: "10kb" }));
 app.use("/api/v1/user", userRoute);

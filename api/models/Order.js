@@ -14,6 +14,11 @@ const orderSchema = new mongoose.Schema({
       },
     },
   ],
+  payment: {
+    paymentMethod: {
+      type: String,
+    },
+  },
   total: { type: Number },
   shipped: { type: Boolean },
 });

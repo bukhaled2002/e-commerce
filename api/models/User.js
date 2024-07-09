@@ -12,6 +12,10 @@ const userSchema = new mongoose.Schema(
       required: [true, "please provide a valid email"],
       unique: true,
     },
+    profilePhoto: {
+      type: String,
+      default: "default.png",
+    },
     password: {
       type: String,
       required: [true, "please provide a valid password"],
@@ -28,6 +32,7 @@ const userSchema = new mongoose.Schema(
         "the passwords are not the same",
       ],
     },
+
     passwordChangedAt: { type: Date },
     location: {
       type: String,

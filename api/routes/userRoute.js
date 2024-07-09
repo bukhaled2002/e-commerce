@@ -17,6 +17,8 @@ const {
   getMe,
   deleteMe,
   getAllUsers,
+  uploadPhoto,
+  resizeImage,
 } = require("../controllers/userController");
 const router = Router();
 const productRouter = require("../routes/productRoute");
@@ -25,7 +27,7 @@ router.post("/signup", signup);
 router.post("/signin", signin);
 
 // dashboard purpose
-router.route("/updateMe").post(protect, updateMe);
+router.route("/updateMe").post(protect, uploadPhoto, resizeImage, updateMe);
 router.route("/getMe").get(protect, getMe);
 router.route("/deleteMe").delete(protect, deleteMe);
 router.route("/").get(getAllUsers);

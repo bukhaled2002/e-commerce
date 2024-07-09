@@ -1,5 +1,8 @@
 const Order = require("../models/Order");
 const User = require("../models/User");
+const multer = require("multer");
+const AppError = require("../utils/AppError");
+const sharp = require("sharp");
 
 exports.getAllUsers = async (req, res, next) => {
   try {
@@ -17,20 +20,67 @@ exports.getAllUsers = async (req, res, next) => {
     });
   }
 };
+
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     // console.log("req", req);
+//     // console.log("file", file);
+//     cb(null, "api/public/img/user");
+//   },
+//   filename: (req, file, cb) => {
+//     cb(
+//       null,
+//       `user-${req.user.id}-${Date.now()}.${file.mimetype.split("/")[1]}`
+//     );
+//   },
+// });
+const multerStorage = multer.memoryStorage();
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("not supported image file", 400), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadPhoto = upload.single("profilePhoto");
+
+exports.resizeImage = async (req, res, next) => {
+  // console.log(req.file);
+  try {
+    if (!req.file) {
+      next();
+    }
+    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toFile(`api/public/img/user/${req.file.filename}`);
+    next();
+  } catch (error) {
+    next();
+  }
+};
 exports.updateMe = async (req, res, next) => {
   try {
     if (req.body.password || req.body.passwordConfirm) {
-      res.status(200).json({
+      return res.status(200).json({
         status: "fail",
         message: "this is not the route to Change password",
       });
     }
     let filterObj = {};
-    console.log(req.body);
     Object.keys(req.body).forEach((el) => {
       if (["name", "email", "location", "phoneNumber"].includes(el))
         filterObj[el] = req.body[el];
     });
+    if (req.file) filterObj.profilePhoto = req.file.filename;
+
     const updatedUser = await User.findByIdAndUpdate(req.user.id, filterObj, {
       new: true,
       runValidators: true,
@@ -41,7 +91,10 @@ exports.updateMe = async (req, res, next) => {
       data: { updatedUser },
     });
   } catch (error) {
-    res.status(403).json({ status: "fail", message: "failed to update" });
+    console.log("error", error);
+    return res
+      .status(403)
+      .json({ status: "fail", message: "failed to update" });
   }
 };
 exports.getMe = async (req, res, next) => {
@@ -58,7 +111,9 @@ exports.getMe = async (req, res, next) => {
       data: null,
     });
   } catch (error) {
-    res.status(403).json({ status: "fail", message: "failed to get user" });
+    return res
+      .status(403)
+      .json({ status: "fail", message: "failed to get user" });
   }
 };
 exports.deleteMe = async (req, res, next) => {

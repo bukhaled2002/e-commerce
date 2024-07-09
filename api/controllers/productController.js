@@ -1,6 +1,40 @@
+const multer = require("multer");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const sharp = require("sharp");
 
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("not supported image file", 400), false);
+  }
+};
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadPhoto = upload.array("images", 6);
+
+exports.resizeImage = async (req, res, next) => {
+  // console.log(req.body, req.files);
+  req.body.images = [];
+  await Promise.all(
+    req.files.map(async (file, id) => {
+      const filename = `product-${req.params.productId}-${id}.jpeg`;
+      req.body.images.push(filename);
+      await sharp(file.buffer)
+        .resize(300, 300)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`api/public/img/product/${filename}`);
+    })
+  );
+  next();
+};
 exports.setVendor = (req, res, next) => {
   if (!req.body.vendor) req.body.vendor = req.params.vendorId;
 
@@ -13,8 +47,8 @@ exports.setVendor = (req, res, next) => {
   next();
 };
 exports.allowVendorToChangeProducts = (req, res, next) => {
+  // console.log(req.body, req.user.id);
   if (req.user?.role === "admin") req.body.vendor = req.user?.id;
-  console.log(req.body.vendor, req.user.id);
   if (req.body.vendor !== req.user?.id) {
     return res
       .status(404)
@@ -31,9 +65,8 @@ exports.setCustomerAndProduct = (req, res, next) => {
 };
 exports.getAllProducts = async (req, res, next) => {
   try {
-    if (req.params.vendorId) req.query.vendor = req.params.vendorId;
-    // filtering system
     let filter = { ...req.query };
+    console.log(req.body);
     if (req.body.vendor) {
       filter.vendor = req.body.vendor;
     }
