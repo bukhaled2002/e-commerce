@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: Number,
-      min: 7,
+      min: 5,
       max: 15,
     },
     role: {

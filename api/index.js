@@ -12,6 +12,7 @@ const reviewRoute = require("./routes/reviewRoute");
 const AppError = require("./utils/AppError");
 const blogSocket = require("./socket/blogSocket");
 const commentSocket = require("./socket/commentSocket");
+const orderRoute = require("./routes/orderRoute");
 
 // set Socket.io event listners
 const server = http.createServer(app);
@@ -25,6 +26,7 @@ app.use(express.json({ limit: "10kb" }));
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/review", reviewRoute);
+app.use("/api/v1/order", orderRoute);
 
 app.all("*", (req, res, next) => {
   const error = new AppError(

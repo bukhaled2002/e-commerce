@@ -1,4 +1,5 @@
 const User = require("../models/User.js");
+const Email = require("../utils/Email.js");
 const AppError = require("../utils/AppError.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -44,6 +45,7 @@ exports.signup = async (req, res, next) => {
     role: req.body.role,
   });
 
+  new Email(newUser, `${req.protocol}://${req.get("host")}/home`).sendWelcome();
   createSendToken(newUser, 200, res);
 };
 
@@ -55,8 +57,6 @@ exports.signin = async (req, res, next) => {
       return next(new AppError("please provide email and password"));
     }
     const user = await User.findOne({ email }).select("+password");
-    console.log(user.password);
-    // const user = await User.findOne({ email });
 
     if (!user || !(await user.correctPassword(password, user.password))) {
       return next(new AppError("incorrect credintials"));
