@@ -13,6 +13,7 @@ const AppError = require("./utils/AppError");
 const blogSocket = require("./socket/blogSocket");
 const commentSocket = require("./socket/commentSocket");
 const orderRoute = require("./routes/orderRoute");
+const { completeOrder } = require("./controllers/orderController");
 
 // set Socket.io event listners
 const server = http.createServer(app);

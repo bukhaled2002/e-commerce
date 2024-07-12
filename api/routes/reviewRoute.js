@@ -5,13 +5,14 @@ const {
   deleteReview,
   getOneReview,
   editReview,
+  setCustomer,
 } = require("../controllers/reviewController");
 const { protect, restrictTo } = require("../controllers/authController");
 const router = Router({ mergeParams: true });
 router
   .route("/")
   .get(getReviews)
-  .post(protect, restrictTo("customer"), createReview);
+  .post(protect, restrictTo("customer"), setCustomer, createReview);
 router
   .route("/:reviewId")
   .get(getOneReview)

@@ -2,7 +2,7 @@ const multer = require("multer");
 const Product = require("../models/Product");
 const User = require("../models/User");
 const sharp = require("sharp");
-
+// we will remove multer in deployement - we will use firebase storage
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
@@ -20,66 +20,59 @@ const upload = multer({
 exports.uploadPhoto = upload.array("images", 6);
 
 exports.resizeImage = async (req, res, next) => {
-  // console.log(req.body, req.files);
-  req.body.images = [];
-  await Promise.all(
-    req.files.map(async (file, id) => {
-      const filename = `product-${req.params.productId}-${id}.jpeg`;
-      req.body.images.push(filename);
-      await sharp(file.buffer)
-        .resize(300, 300)
-        .toFormat("jpeg")
-        .jpeg({ quality: 90 })
-        .toFile(`api/public/img/product/${filename}`);
-    })
-  );
+  if (req.files) {
+    req.body.images = [];
+    await Promise.all(
+      req.files.map(async (file, id) => {
+        const filename = `product-${req.params.productId}-${id}.jpeg`;
+        req.body.images.push(filename);
+        await sharp(file.buffer)
+          .resize(300, 300)
+          .toFormat("jpeg")
+          .jpeg({ quality: 90 })
+          .toFile(`api/public/img/product/${filename}`);
+      })
+    );
+    next();
+  }
   next();
 };
+
 exports.setVendor = (req, res, next) => {
-  if (!req.body.vendor) req.body.vendor = req.params.vendorId;
-
-  if (req.body.vendor !== req.user?.id) {
-    return res
-      .status(404)
-      .json({ message: "not allowed to change others products" });
-  }
+  if (!req.body.vendor) req.body.vendor = req.user.id;
 
   next();
 };
-exports.allowVendorToChangeProducts = (req, res, next) => {
-  // console.log(req.body, req.user.id);
-  if (req.user?.role === "admin") req.body.vendor = req.user?.id;
-  if (req.body.vendor !== req.user?.id) {
-    return res
-      .status(404)
-      .json({ message: "not allowed to change others products" });
-  }
-
-  next();
-};
-exports.setCustomerAndProduct = (req, res, next) => {
+exports.setCustomer = (req, res, next) => {
   if (!req.body.customer) req.body.customer = req.params.customerId;
-  if (!req.body.product) req.body.product = req.params.productId;
-
   next();
 };
 exports.getAllProducts = async (req, res, next) => {
   try {
     let filter = { ...req.query };
-    console.log(req.body);
-    if (req.body.vendor) {
-      filter.vendor = req.body.vendor;
-    }
-    console.log(req.query);
     const query = Product.find(filter);
 
     const products = await query;
+    console.log(products);
     res
       .status(200)
       .json({ status: "success", results: products.length, data: products });
   } catch (error) {
     res.status(404).json({ status: "fail", message: "cannot get products" });
   }
+};
+
+exports.getMyProduct = async (req, res, next) => {
+  let products;
+  if (req.user.role === "vendor") {
+    console.log("vendor");
+    products = await Product.find({ vendor: req.user.id });
+  } else if (req.user.role === "customer") {
+    products = await Product.find({ customer: req.user.id });
+  }
+  res
+    .status(200)
+    .json({ status: "success", results: products.length, data: products });
 };
 exports.getOneProduct = async (req, res, next) => {
   try {
@@ -169,27 +162,37 @@ exports.getWishlist = async (req, res, next) => {
 
 exports.addToWishlist = async (req, res, next) => {
   try {
-    const result = await User.updateOne(
-      {
-        _id: req.body.customer,
-        wishList: { $not: { $in: [req.body.product] } },
-      },
-      { $addToSet: { wishList: req.body.product } },
-      { new: true, runValidators: true }
-    );
-    console.log(result);
-    if (result.modifiedCount === 1) {
-      return res.status(200).json({
-        status: "success",
-        message: "Wishlist added successfully",
-        wishList: req.params.productId,
-      });
-    } else {
+    // const result = await User.updateOne(
+    //   {
+    //     _id: req.body.customer,
+    //     wishList: { $not: { $in: [req.params.productId] } },
+    //   },
+    //   { $addToSet: { wishList: req.body.product } },
+    //   { new: true, runValidators: true }
+    // );
+    // console.log(result);
+    // if (result.modifiedCount === 1) {
+    //   return res.status(200).json({
+    //     status: "success",
+    //     message: "Wishlist added successfully",
+    //     wishList: req.params.productId,
+    //   });
+
+    const result = await User.findOne({ id: req.user.id });
+    if (req.params.productId in result.wishList) {
       return res.status(400).json({
         status: "fail",
-        message: "cannot add product to wishlist",
+        message: "product already added to wishlist",
       });
     }
+
+    result.wishList.push(req.params.productId);
+    await result.save();
+    return res.status(200).json({
+      status: "success",
+      message: "Wishlist added successfully",
+      wishList: req.params.productId,
+    });
   } catch (error) {
     console.error("Error adding to wishlist:", error);
     res.status(400).json({

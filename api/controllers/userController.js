@@ -105,11 +105,6 @@ exports.getMe = async (req, res, next) => {
       message: "retrieved successfully",
       data: { user },
     });
-    res.status(200).json({
-      status: "success",
-      message: "deleted successfully",
-      data: null,
-    });
   } catch (error) {
     return res
       .status(403)

@@ -10,14 +10,8 @@ const filteringObj = (filter, filterObj) => {
 
 exports.getReviews = async (req, res, next) => {
   try {
-    let filterObj = filteringObj(["product", "vendor", "product"], req.body);
-    console.log(filterObj);
-    // if (vendor) {
-    //   filterObj.vendor = vendor;
-    // }
-    // if (product) {
-    //   filterObj.vendor = product;
-    // }
+    let filterObj = filteringObj(["product", "vendor", "customer"], req.body);
+
     const reviews = await Review.find(filterObj);
     if (!reviews) {
       return res.status(404).json({
@@ -57,15 +51,13 @@ exports.getOneReview = async (req, res, next) => {
       .json({ status: "fail", message: "cannot get reviews" });
   }
 };
+exports.setCustomer = async (req, res, next) => {
+  if (!req.body.customer) req.body.customer = req.user.id;
+  next();
+};
 exports.createReview = async (req, res, next) => {
   try {
-    if (req.body.customer !== req.user.id) {
-      return res.status(400).json({
-        status: "fail",
-        message: "not allowed to add comment for another customer",
-      });
-    }
-    const review = await Review.create(req.body);
+    const review = await Review.create({ ...req.body });
     console.log(review);
     return res.status(200).json({ status: "success", data: { review } });
   } catch (error) {
@@ -76,18 +68,24 @@ exports.createReview = async (req, res, next) => {
 };
 exports.editReview = async (req, res, next) => {
   try {
-    if (req.body.customer !== req.user.id) {
+    const filterObj = filteringObj(["rating", "comment"], req.body);
+    console.log(filterObj, req.params.reviewId, req.user.id);
+    const review = await Review.findOneAndUpdate(
+      {
+        _id: req.params.reviewId,
+        customer: req.user.id,
+      },
+      filterObj,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+    if (!review) {
       return res
         .status(400)
-        .json({ status: "fail", message: "cannot change others review" });
+        .json({ error: "error in changing the review, try again" });
     }
-    const filterObj = filteringObj(["rating", "comment"], req.body);
-    console.log(filterObj);
-    const review = await Review.findByIdAndUpdate(
-      req.params.reviewId,
-      req.body,
-      { new: true, runValidators: true }
-    );
     return res.status(200).json({
       status: "success",
       message: "reveiw changed successfully",
@@ -101,12 +99,10 @@ exports.editReview = async (req, res, next) => {
 };
 exports.deleteReview = async (req, res, next) => {
   try {
-    if (req.body.customer !== req.user.id) {
-      return res
-        .status(400)
-        .json({ status: "fail", message: "cannot delete others review" });
-    }
-    await Review.findByIdAndDelete(req.params.reviewId);
+    await Review.findOneAndDelete({
+      _id: req.params.reviewId,
+      customer: req.user.id,
+    });
     return res.status(200).json({
       status: "success",
       message: "reveiw deleted successfully",

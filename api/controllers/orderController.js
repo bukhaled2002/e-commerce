@@ -3,6 +3,8 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 exports.getCheckoutSession = async (req, res, next) => {
   try {
     const { cart, shippingAddress } = req.body;
+    const successUrl =
+      "http://localhost:3000/api/v1/order/checkout/complete?session_id={CHECKOUT_SESSION_ID}";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -23,20 +25,39 @@ exports.getCheckoutSession = async (req, res, next) => {
         };
       }),
       mode: "payment",
-      success_url: `${req.protocol}://${req.get("host")}/home`,
+      success_url: successUrl,
       cancel_url: `${req.protocol}://${req.get("host")}/home`,
       customer_email: req.user.email,
       shipping_address: shippingAddress,
     });
-    return res.status(200).json({
+    req.cart = {
+      productsId: cart.map((item) => item.id),
+      shipping: shippingAddress,
+    };
+    res.status(200).json({
       status: "success",
       session,
     });
   } catch (error) {
     console.log(error);
-    return res.status(400).json({
+    res.status(400).json({
       status: "fail",
       message: "cannot complete payment, try again later",
+    });
+  }
+};
+
+exports.completeOrder = async (req, res, next) => {
+  try {
+    res.status(200).json({
+      status: "success",
+      message: "Order completed successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      status: "fail",
+      message: "Cannot complete payment, try again later",
     });
   }
 };

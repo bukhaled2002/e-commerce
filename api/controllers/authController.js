@@ -96,7 +96,6 @@ exports.protect = async (req, res, next) => {
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {
-    console.log(roles.includes(req.user.role));
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError("you don't have the permision to perform this actions.")
