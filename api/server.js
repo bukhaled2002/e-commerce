@@ -37,9 +37,9 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/order", orderRoute);
 
-app.use(express.static(`${__dirname}/build/client/dist`));
+app.use(express.static(`${__dirname}/../client/dist`));
 app.all("*", (req, res, next) => {
-  res.sendFile(`${__dirname}/build/client/dist/index.html`);
+  res.sendFile(`${__dirname}/../client/dist/index.html`);
 });
 app.all("*", (req, res, next) => {
   const error = new AppError(
