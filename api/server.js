@@ -18,7 +18,6 @@ const { completeOrder } = require("./controllers/orderController");
 const errorHandler = require("./controllers/errorHandling");
 
 // set Socket.io event listners
-app.engine("hbs", exphbs());
 const server = http.createServer(app);
 const io = socketIo(server);
 blogSocket(io);
