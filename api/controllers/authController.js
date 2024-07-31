@@ -109,10 +109,12 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
+    console.log(token);
     if (!token)
       return next(new AppError("you are not logged in to access.", 401));
     // verificate the token
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+    console.log(decoded);
 
     const currentUser = await User.findById(decoded.id);
     if (!currentUser)
