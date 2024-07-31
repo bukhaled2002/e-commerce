@@ -7,6 +7,7 @@ const customFetch = axios.create({
 });
 customFetch.interceptors.request.use((config) => {
   const authToken = Cookies.get("jwt");
+  console.log(authToken);
   if (authToken) {
     config.headers.Authorization = `Bearer ${authToken}`;
   }
