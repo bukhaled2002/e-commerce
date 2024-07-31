@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const customFetch = axios.create({
-  baseURL: "https://e-commerce-vuni.onrender.com/",
+  baseURL: "https://e-commerce-vuni.onrender.com/api/v1",
   headers: { "Content-Type": "application/json" },
 });
 customFetch.interceptors.request.use((config) => {
