@@ -109,7 +109,7 @@ exports.protect = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
-    console.log(token);
+    console.log(req.headers);
     if (!token)
       return next(new AppError("you are not logged in to access.", 401));
     // verificate the token
