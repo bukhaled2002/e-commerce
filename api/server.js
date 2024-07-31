@@ -16,8 +16,11 @@ const commentSocket = require("./socket/commentSocket");
 const orderRoute = require("./routes/orderRoute");
 const { completeOrder } = require("./controllers/orderController");
 const errorHandler = require("./controllers/errorHandling");
+const exphbs = require("express-handlebars");
 
 // set Socket.io event listners
+app.engine("hbs", exphbs());
+app.set("view engine", "hbs");
 const server = http.createServer(app);
 const io = socketIo(server);
 blogSocket(io);
@@ -37,6 +40,7 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/order", orderRoute);
 
+app.use(express.static(path.join(__dirname, "build")));
 app.all("*", (req, res, next) => {
   res.render(`${__dirname}/../client/dist/index.html`);
 });
