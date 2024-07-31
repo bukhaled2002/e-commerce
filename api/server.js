@@ -38,6 +38,9 @@ app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/order", orderRoute);
 
 app.all("*", (req, res, next) => {
+  res.render(`${__dirname}/../client/dist/index.html`);
+});
+app.all("*", (req, res, next) => {
   const error = new AppError(
     `this url (${req.originalUrl}) || (${req.url}) is not valid`,
     404
@@ -46,7 +49,7 @@ app.all("*", (req, res, next) => {
 });
 
 app.use(errorHandler);
-const port = undefined || 3000;
+const port = process.env.PORT || 3000;
 const DB =
   "mongodb+srv://bakhaled310:ml5sQ8Tc3Pda6LPY@cluster0.4llkhxl.mongodb.net/e-commerce";
 
