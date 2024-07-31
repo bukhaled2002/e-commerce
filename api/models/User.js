@@ -14,7 +14,13 @@ const userSchema = new mongoose.Schema(
     },
     profilePhoto: {
       type: String,
-      default: "default.png",
+      default:
+        "https://www.pngarts.com/files/10/Default-Profile-Picture-PNG-Download-Image.png",
+    },
+    coverPhoto: {
+      type: String,
+      default:
+        "https://theoheartist.com/wp-content/uploads/sites/2/2015/01/fbdefault.png",
     },
     password: {
       type: String,
@@ -89,14 +95,12 @@ userSchema.pre(/^find/, function (next) {
 });
 
 userSchema.methods.correctPassword = async function (password, dbPassword) {
-  console.log(password, dbPassword);
   return await bcrypt.compare(password, dbPassword);
 };
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   let changedTimestamp;
   if (this.passwordChangedAt) {
     changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
-    console.log(this.passwordChangedAt);
     return JWTTimestamp < changedTimestamp;
   }
   return false;

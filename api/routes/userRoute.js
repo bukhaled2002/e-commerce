@@ -4,6 +4,7 @@ const {
   protect,
   restrictTo,
   signin,
+  googleAuth,
 } = require("../controllers/authController");
 const {
   getAllVendors,
@@ -25,9 +26,10 @@ const productRouter = require("../routes/productRoute");
 // authentication
 router.post("/signup", signup);
 router.post("/signin", signin);
+router.post("/googleAuth", googleAuth);
 
 // dashboard purpose
-router.route("/updateMe").post(protect, uploadPhoto, resizeImage, updateMe);
+router.route("/updateMe").post(protect, updateMe);
 router.route("/getMe").get(protect, getMe);
 router.route("/deleteMe").delete(protect, deleteMe);
 router.route("/").get(getAllUsers);

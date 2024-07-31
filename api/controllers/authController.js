@@ -37,16 +37,24 @@ const createSendToken = (user, statusCode, res) => {
   }
 };
 exports.signup = async (req, res, next) => {
-  const newUser = await User.create({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role,
-  });
+  try {
+    const newUser = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
+      role: req.body.role,
+    });
 
-  new Email(newUser, `${req.protocol}://${req.get("host")}/home`).sendWelcome();
-  createSendToken(newUser, 200, res);
+    new Email(
+      newUser,
+      `${req.protocol}://${req.get("host")}/home`
+    ).sendWelcome();
+    createSendToken(newUser, 200, res);
+  } catch (error) {
+    console.log(error);
+    next(new AppError("error in credintial", 400));
+  }
 };
 
 exports.signin = async (req, res, next) => {
@@ -63,35 +71,64 @@ exports.signin = async (req, res, next) => {
     }
     createSendToken(user, 200, res);
   } catch (error) {
-    next(error);
+    next(new AppError("error in credintial", 400));
   }
 };
 
-exports.protect = async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1];
-  }
-  if (!token)
-    return next(new AppError("you are not logged in to access.", 401));
-  // verificate the token
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+exports.googleAuth = async (req, res, next) => {
+  try {
+    const email = req.body.email;
+    console.log(req.body.profilePhoto);
+    const user = await User.findOne({ email });
+    if (user) {
+      createSendToken(user, 200, res);
+    } else {
+      const newUser = await User.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password,
+        passwordConfirm: req.body.passwordConfirm,
+      });
 
-  const currentUser = await User.findById(decoded.id);
-  if (!currentUser)
-    return next(
-      new AppError("the user belonging to this token no longer exist", 401)
-    );
-  if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(
-      new AppError("User recently changed password! please log in again")
-    );
+      new Email(
+        newUser,
+        `${req.protocol}://${req.get("host")}/home`
+      ).sendWelcome();
+      createSendToken(newUser, 200, res);
+    }
+  } catch (error) {
+    next(new AppError("error in google auth", 404));
   }
-  req.user = currentUser;
-  next();
+};
+exports.protect = async (req, res, next) => {
+  try {
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+    if (!token)
+      return next(new AppError("you are not logged in to access.", 401));
+    // verificate the token
+    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser)
+      return next(
+        new AppError("the user belonging to this token no longer exist", 401)
+      );
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next(
+        new AppError("User recently changed password! please log in again")
+      );
+    }
+    req.user = currentUser;
+    next();
+  } catch (error) {
+    next(new AppError("error in jwt token", 400));
+  }
 };
 exports.restrictTo =
   (...roles) =>

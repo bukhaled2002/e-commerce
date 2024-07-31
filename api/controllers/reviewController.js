@@ -11,7 +11,6 @@ const filteringObj = (filter, filterObj) => {
 exports.getReviews = async (req, res, next) => {
   try {
     let filterObj = filteringObj(["product", "vendor", "customer"], req.body);
-
     const reviews = await Review.find(filterObj);
     if (!reviews) {
       return res.status(404).json({
@@ -33,7 +32,9 @@ exports.getReviews = async (req, res, next) => {
 };
 exports.getOneReview = async (req, res, next) => {
   try {
-    const review = await Review.findById(req.param.reviewId);
+    const review = await Review.findById(req.param.reviewId).populate({
+      path: "vendor",
+    });
     if (!review) {
       return res.status(404).json({
         status: "fail",
@@ -61,9 +62,10 @@ exports.createReview = async (req, res, next) => {
     console.log(review);
     return res.status(200).json({ status: "success", data: { review } });
   } catch (error) {
+    console.log(error);
     return res
       .status(400)
-      .json({ status: "fail", message: "cannot add reviewe", error });
+      .json({ status: "fail", message: "cannot add review", error });
   }
 };
 exports.editReview = async (req, res, next) => {

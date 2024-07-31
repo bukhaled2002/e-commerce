@@ -9,8 +9,8 @@ const productSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: [true, "please provide category filed"],
-      enum: ["clothes", "smartphones"],
+      required: [true, "please provide category field"],
+      enum: ["clothes", "smartphones", "accessories", "goods"],
     },
     description: {
       type: String,
@@ -18,7 +18,13 @@ const productSchema = new mongoose.Schema(
       minLength: [10, "description must be more than 10 charachters"],
     },
     tags: [String],
-    images: [String],
+    images: {
+      type: String,
+      requierd: true,
+      default:
+        "https://marketplace.canva.com/EAFNVAn583I/1/0/800w/canva-minimal-paper-coming-soon-instagram-post-ChSd0pJy1DQ.jpg",
+    },
+
     price: {
       type: Number,
       required: [true, "you must provide price"],
@@ -26,19 +32,25 @@ const productSchema = new mongoose.Schema(
       max: 100000,
     },
     vendor: { type: mongoose.Schema.ObjectId, ref: "User" },
-    reviews: [{ type: mongoose.Schema.ObjectId, ref: "Review" }],
     quantity: {
       type: Number,
       required: [true, "please provide quantity of item"],
     },
+    avgRating: { type: Number, default: 3 },
     discount: { type: Number, default: 0 },
     freeShipping: { type: Boolean, default: false },
   },
+
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
+});
 const Product = mongoose.model("Product", productSchema);
 module.exports = Product;

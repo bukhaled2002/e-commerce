@@ -2,15 +2,16 @@
   "name": "e-commerce",
   "version": "1.0.0",
   "description": "VENDOR:\r First Name\r Last Name\r Email\r Profile Pic\r Password\r Confirm Password\r Products:[PRODUCT_ID]\r Date\r Location\r PhoneNUmber\r Reviews:[Review_ID]",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon api/index.js",
-    "start": "node api/index.js"
+    "dev": "nodemon api/server.js",
+    "start": "node api/server.js"
   },
   "author": "Mohamed Khaled",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
@@ -23,6 +24,8 @@
     "stripe": "^16.2.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.13",
+    "daisyui": "^4.12.10",
     "nodemon": "^3.1.4"
   }
 }

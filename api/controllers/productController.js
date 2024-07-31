@@ -2,6 +2,7 @@ const multer = require("multer");
 const Product = require("../models/Product");
 const User = require("../models/User");
 const sharp = require("sharp");
+const AppError = require("../utils/AppError");
 // we will remove multer in deployement - we will use firebase storage
 const multerStorage = multer.memoryStorage();
 
@@ -12,31 +13,6 @@ const multerFilter = (req, file, cb) => {
     cb(new AppError("not supported image file", 400), false);
   }
 };
-const upload = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-});
-
-exports.uploadPhoto = upload.array("images", 6);
-
-exports.resizeImage = async (req, res, next) => {
-  if (req.files) {
-    req.body.images = [];
-    await Promise.all(
-      req.files.map(async (file, id) => {
-        const filename = `product-${req.params.productId}-${id}.jpeg`;
-        req.body.images.push(filename);
-        await sharp(file.buffer)
-          .resize(300, 300)
-          .toFormat("jpeg")
-          .jpeg({ quality: 90 })
-          .toFile(`api/public/img/product/${filename}`);
-      })
-    );
-    next();
-  }
-  next();
-};
 
 exports.setVendor = (req, res, next) => {
   if (!req.body.vendor) req.body.vendor = req.user.id;
@@ -44,44 +20,108 @@ exports.setVendor = (req, res, next) => {
   next();
 };
 exports.setCustomer = (req, res, next) => {
-  if (!req.body.customer) req.body.customer = req.params.customerId;
+  if (!req.body.customer) req.body.customer = req.user.id;
   next();
 };
 exports.getAllProducts = async (req, res, next) => {
   try {
-    let filter = { ...req.query };
-    const query = Product.find(filter);
+    const {
+      name,
+      category,
+      maxPrice,
+      vendor,
+      sort,
+      page = 1,
+      limit = 10,
+    } = req.query;
+    let filterQuery = {};
+    console.log(req.query);
 
-    const products = await query;
-    console.log(products);
-    res
-      .status(200)
-      .json({ status: "success", results: products.length, data: products });
+    if (name) {
+      filterQuery.name = { $regex: name, $options: "i" };
+    }
+    if (category) filterQuery.category = category;
+    if (maxPrice) filterQuery.price = { $lte: +maxPrice };
+    if (vendor) {
+      const { id } = await User.findOne({ name: vendor, role: "vendor" });
+      filterQuery.vendor = id;
+    }
+
+    const query = Product.find(filterQuery);
+
+    // Sort based on the `sort` query parameter
+    if (sort) {
+      const sortFields = {};
+      sort.split(",").forEach((field) => {
+        sort.split(",").forEach((field) => {
+          if (field.startsWith("-")) {
+            sortFields[field.slice(1)] = -1;
+          } else {
+            sortFields[field] = 1;
+          }
+        });
+      });
+      query.sort(sortFields);
+    } else {
+      query.sort({ price: 1 });
+    }
+
+    query.skip((page - 1) * limit).limit(limit);
+
+    const products = await query.populate({ path: "vendor", select: "name" });
+    const totalCounts = await Product.countDocuments(filterQuery);
+    const totalPages = Math.ceil(totalCounts / limit);
+    if (page > totalPages) {
+      next(new AppError("no more Pages", 404));
+    }
+    res.status(200).json({
+      status: "success",
+      totalResults: totalCounts,
+      totalPages: totalPages,
+      currentPage: page,
+      data: products,
+    });
   } catch (error) {
-    res.status(404).json({ status: "fail", message: "cannot get products" });
+    console.log(error);
+    next(new AppError("cannot get products", 404));
   }
 };
 
 exports.getMyProduct = async (req, res, next) => {
-  let products;
-  if (req.user.role === "vendor") {
-    console.log("vendor");
-    products = await Product.find({ vendor: req.user.id });
-  } else if (req.user.role === "customer") {
-    products = await Product.find({ customer: req.user.id });
+  try {
+    let products;
+    if (req.user.role === "vendor") {
+      products = await Product.find({ vendor: req.user.id });
+    } else if (req.user.role === "customer") {
+      products = await Product.find({ customer: req.user.id });
+    }
+    res
+      .status(200)
+      .json({ status: "success", results: products.length, data: products });
+  } catch (error) {
+    next(new AppError("fail to get the products", 404));
   }
-  res
-    .status(200)
-    .json({ status: "success", results: products.length, data: products });
 };
 exports.getOneProduct = async (req, res, next) => {
   try {
-    const product = await Product.findById(req.params.productId);
+    const product = await Product.findById(req.params.productId)
+      .populate({
+        path: "reviews",
+        options: {
+          sort: { updatedAt: -1 },
+        },
+        populate: {
+          path: "customer",
+          model: "User",
+          select: "name profilePhoto",
+        },
+      })
+      .populate({ path: "vendor", select: "name" });
+
     return res.status(200).json({ status: "success", data: product });
   } catch (error) {
-    return res
-      .status(404)
-      .json({ status: "fail", message: "cannot find product" });
+    console.log(error);
+    next(new AppError("cannot find product", 404));
   }
 };
 
@@ -94,22 +134,19 @@ exports.createProduct = async (req, res, next) => {
       product,
     });
   } catch (error) {
-    return res
-      .status(404)
-      .json({ status: "fail", message: "cannot find product" });
+    console.log(error);
+    next(new AppError("cannot add product", 404));
   }
 };
 exports.updateProduct = async (req, res, next) => {
   try {
-    const productUpdated = await Product.findByIdAndUpdate(
-      req.params.productId,
+    const productUpdated = await Product.findOneAndUpdate(
+      { _id: req.params.productId, vendor: req.user.id },
       req.body,
       { new: true, runValidators: true }
     );
     if (!productUpdated) {
-      return res
-        .status(405)
-        .json({ status: "fail", message: "cannot change product" });
+      next(new AppError("cannot change product", 405));
     }
     res.status(202).json({
       status: "success",
@@ -117,16 +154,20 @@ exports.updateProduct = async (req, res, next) => {
       productUpdated,
     });
   } catch (error) {
-    return res.status(404).json("ssss");
+    next(new AppError("error in updating product", 404));
   }
 };
 
 exports.deleteProduct = async (req, res, next) => {
   try {
-    await Product.findByIdAndDelete(req.body.product);
+    const product = await Product.findOneAndDelete({
+      _id: req.params.productId,
+      vendor: req.body.vendor,
+    });
+    console.log("deleted", product);
     res.status(202).json({ message: "successfully deleted" });
   } catch (error) {
-    return res.status(404).json({ message: "item not found" });
+    next(new AppError("item not found", 404));
   }
 };
 exports.getWishlist = async (req, res, next) => {
@@ -140,46 +181,18 @@ exports.getWishlist = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "wishList retrieved successfully",
-      wishList,
+      data: wishList,
     });
   } catch (error) {
-    res.status(400).json({
-      status: "fail",
-      message: "failed to retrieve wishlist",
-    });
+    next(new AppError("failed to retrieve wishlist", 400));
   }
 };
-// const setCustomer=(req,res,next)=>{
-
-//         if (!req.params.customerId) req.params.customerId = req.user.id;
-//         if (!req.params.productId) {
-//           return res.status(400).json({
-//             status: "fail",
-//             message: "Product ID is required",
-//           });
-//         }
-// }
 
 exports.addToWishlist = async (req, res, next) => {
   try {
-    // const result = await User.updateOne(
-    //   {
-    //     _id: req.body.customer,
-    //     wishList: { $not: { $in: [req.params.productId] } },
-    //   },
-    //   { $addToSet: { wishList: req.body.product } },
-    //   { new: true, runValidators: true }
-    // );
-    // console.log(result);
-    // if (result.modifiedCount === 1) {
-    //   return res.status(200).json({
-    //     status: "success",
-    //     message: "Wishlist added successfully",
-    //     wishList: req.params.productId,
-    //   });
-
-    const result = await User.findOne({ id: req.user.id });
-    if (req.params.productId in result.wishList) {
+    const result = await User.findOne({ _id: req.user.id });
+    console.log(result.wishList, req.params.productId);
+    if (result.wishList.includes(req.params.productId)) {
       return res.status(400).json({
         status: "fail",
         message: "product already added to wishlist",
@@ -187,7 +200,7 @@ exports.addToWishlist = async (req, res, next) => {
     }
 
     result.wishList.push(req.params.productId);
-    await result.save();
+    await result.save({ validateBeforeSave: false });
     return res.status(200).json({
       status: "success",
       message: "Wishlist added successfully",
@@ -195,46 +208,32 @@ exports.addToWishlist = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error adding to wishlist:", error);
-    res.status(400).json({
-      status: "fail",
-      message: "Failed to add to wishlist",
-      error: error.message,
-    });
+    next(new AppError("Failed to add to wishlist", 400));
   }
 };
 exports.removeFromWishlist = async (req, res, next) => {
   try {
-    const result = await User.updateOne(
-      {
-        _id: req.body.customer,
-        wishList: { $in: [req.body.product] },
-      },
-      { $pull: { wishList: req.body.product } },
-      { new: true, runValidators: true }
-    );
+    const result = await User.findOne({
+      _id: req.body.customer,
+    });
+    if (result.wishList.includes(req.params.productId)) {
+      result.wishList = result.wishList.filter(
+        (item) => item !== req.params.productId
+      );
+      result.wishList = result.wishList.filter(
+        (item) => !item.equals(req.params.productId)
+      );
+      console.log(result.wishList.length);
 
-    if (result.modifiedCount === 1) {
+      await result.save({ validateBeforeSave: false });
       return res.status(200).json({
         status: "success",
-        message: "Removed from wishlist successfully",
-      });
-    } else if (result.matchedCount === 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "User not found or product not in wishlist",
-      });
-    } else {
-      return res.status(400).json({
-        status: "fail",
-        message: "Failed to remove from wishlist",
+        message: "Wishlist removed successfully",
+        wishList: result.wishList,
       });
     }
   } catch (error) {
-    console.error("Error removing from wishlist:", error);
-    res.status(400).json({
-      status: "fail",
-      message: "Failed to remove from wishlist",
-      error: error.message,
-    });
+    console.error(error);
+    next(new AppError("Failed to remove from wishlist", 400));
   }
 };

@@ -47,40 +47,26 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-exports.uploadPhoto = upload.single("profilePhoto");
-
-exports.resizeImage = async (req, res, next) => {
-  // console.log(req.file);
-  try {
-    if (!req.file) {
-      next();
-    }
-    req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
-    await sharp(req.file.buffer)
-      .resize(500, 500)
-      .toFormat("jpeg")
-      .jpeg({ quality: 90 })
-      .toFile(`api/public/img/user/${req.file.filename}`);
-    next();
-  } catch (error) {
-    next();
-  }
-};
 exports.updateMe = async (req, res, next) => {
   try {
+    console.log(req.body);
     if (req.body.password || req.body.passwordConfirm) {
-      return res.status(200).json({
-        status: "fail",
-        message: "this is not the route to Change password",
-      });
+      next(new AppError("this is not the route to Change password", 400));
     }
     let filterObj = {};
     Object.keys(req.body).forEach((el) => {
-      if (["name", "email", "location", "phoneNumber"].includes(el))
+      if (
+        [
+          "name",
+          "email",
+          "location",
+          "phoneNumber",
+          "profilePhoto",
+          "coverPhoto",
+        ].includes(el)
+      )
         filterObj[el] = req.body[el];
     });
-    if (req.file) filterObj.profilePhoto = req.file.filename;
-
     const updatedUser = await User.findByIdAndUpdate(req.user.id, filterObj, {
       new: true,
       runValidators: true,
@@ -92,9 +78,7 @@ exports.updateMe = async (req, res, next) => {
     });
   } catch (error) {
     console.log("error", error);
-    return res
-      .status(403)
-      .json({ status: "fail", message: "failed to update" });
+    next(new AppError("failed to update", 403));
   }
 };
 exports.getMe = async (req, res, next) => {
