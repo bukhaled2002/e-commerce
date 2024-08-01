@@ -30,7 +30,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://localhost:5173",
-      "https://e-commerce-vuni.onrender.com",
+      "https://e-commerce-1-a403.onrender.com",
     ],
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
