@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "install-client": "cd client && npm install",
     "build-client": "cd client && npm run build",
-    "start-client": "cd client && npm run start"
+    "start-client": "cd client && npm run dev"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.6",
