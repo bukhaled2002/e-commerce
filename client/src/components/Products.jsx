@@ -28,7 +28,6 @@ function Products() {
           // add ratings average
           const { name, price, description, images, avgRating } = item;
           const avgRate = Math.floor(avgRating);
-          console.log(avgRate);
           return (
             <div
               className="card bg-[#79899d3f] w-72 shadow-xl max-h-96"
@@ -72,7 +71,6 @@ function Products() {
                 <p>{description}</p>
                 <div className="rating mt-2">
                   {[1, 2, 3, 4, 5].map((star) => {
-                    console.log(star, avgRate);
                     return (
                       <input
                         key={star}

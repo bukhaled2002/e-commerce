@@ -27,11 +27,7 @@ commentSocket(io);
 app.use(express.json({ limit: "10kb" }));
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "https://e-commerce-1-a403.onrender.com",
-    ],
+    origin: ["http://localhost:5173"],
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
