@@ -27,8 +27,14 @@ commentSocket(io);
 app.use(express.json({ limit: "10kb" }));
 app.use(
   cors({
-    origin: ["https://e-commerce-vuni.onrender.com"],
-    // allowedHeaders: ["Content-Type"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "https://e-commerce-vuni.onrender.com",
+    ],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
 
@@ -37,10 +43,10 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/order", orderRoute);
 
-app.use(express.static(`${__dirname}/../client/dist`));
-app.all("*", (req, res, next) => {
-  res.sendFile(`${__dirname}/../client/dist/index.html`);
+app.get("/", (req, res) => {
+  res.status(201).json({ message: "Connected to Backend!" });
 });
+
 app.all("*", (req, res, next) => {
   const error = new AppError(
     `this url (${req.originalUrl}) || (${req.url}) is not valid`,
@@ -51,8 +57,7 @@ app.all("*", (req, res, next) => {
 
 app.use(errorHandler);
 const port = process.env.PORT || 3000;
-const DB =
-  "mongodb+srv://bakhaled310:ml5sQ8Tc3Pda6LPY@cluster0.4llkhxl.mongodb.net/e-commerce";
+const DB = process.env.MONGODB_URI;
 
 mongoose.connect(DB);
 
