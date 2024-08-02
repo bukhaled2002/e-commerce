@@ -48,7 +48,7 @@ exports.getCheckoutSession = async (req, res, next) => {
 };
 
 exports.webhook = async (req, res, next) => {
-  const sig = req.headers["stripe-signature"];
+  const sig = req.headers;
   console.log(sig);
   let event;
   try {
@@ -58,7 +58,9 @@ exports.webhook = async (req, res, next) => {
       process.env.STRIPE_WEBHOOK_SECRET
     );
     console.log("event", event.data.object);
-  } catch {}
+  } catch (error) {
+    console.log(error);
+  }
   res.json("200");
 };
 // exports.completeOrder = async (req, res, next) => {
