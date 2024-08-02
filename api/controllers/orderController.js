@@ -57,7 +57,7 @@ exports.webhook = async (req, res, next) => {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-    console.log("event", event.type);
+    console.log("event", event.data.object);
   } catch (err) {
     return res.status(400).send(`Webhook Error ${err.message}`);
   }
