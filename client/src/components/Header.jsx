@@ -4,7 +4,7 @@ import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { FiSun } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, redirect, useLoaderData } from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 import { logout } from "../features/user/userSlice";
 function Header() {
   const user = useSelector((state) => state.user.user);
@@ -19,6 +19,7 @@ function Header() {
       console.error("Error during logout:", error);
     }
   };
+  console.log(user);
   return (
     <header className="flex pt-5 px-5 items-center justify-between md:px-16 sm:10 lg:px28 gap-3">
       <NavLogo />

@@ -1,12 +1,17 @@
-import { redirect, useLoaderData } from "react-router";
 import Products from "../components/Products";
 import customFetch from "../utils/customFetch";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-export const loader = async () => {
+import {
+  setIsLoadingtoFalse,
+  setIsLoadingtoTrue,
+} from "../features/user/userSlice";
+export const loader = (store) => async () => {
   try {
+    store.dispatch(setIsLoadingtoTrue());
     const response = await customFetch.get("/product/wishlist");
     console.log(response);
+    store.dispatch(setIsLoadingtoFalse());
     return response.data;
   } catch (error) {
     console.log(error);

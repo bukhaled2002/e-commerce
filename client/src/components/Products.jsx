@@ -9,7 +9,7 @@ import { addToCart } from "../features/cart/cartSlice";
 import Pagination from "./Pagination";
 
 function Products() {
-  const { user } = useSelector((state) => state.user);
+  const { user, loading } = useSelector((state) => state.user);
   const { data } = useLoaderData();
   const dispatch = useDispatch();
   const handleAddToWishlist = async (id) => {
@@ -21,6 +21,12 @@ function Products() {
     await customFetch.delete("/product/wishlist/" + id);
     dispatch(removeFromWishlist(id));
   };
+
+  if (loading === true) {
+    return (
+      <span className="loading loading-spinner loading-lg block mx-auto mt-20"></span>
+    );
+  }
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 max-w-72 gap-10 sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg mx-auto justify-items-center mb-8">
@@ -76,6 +82,7 @@ function Products() {
                         key={star}
                         value={star}
                         checked={star === avgRate}
+                        readOnly={true}
                         type="radio"
                         name={`rating-${item.id}-${star}`}
                         className="mask mask-star bg-yellow-400 cursor-default foc"

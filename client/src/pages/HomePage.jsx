@@ -2,30 +2,41 @@ import customFetch from "../utils/customFetch";
 
 import Products from "../components/Products";
 import Title from "../components/Title";
+import {
+  setIsLoadingtoFalse,
+  setIsLoadingtoTrue,
+} from "../features/user/userSlice";
 
-export const loader = async ({ request }) => {
-  try {
-    const url = new URL(request.url);
-    const queryParameters = Object.fromEntries(url.searchParams);
-    if (queryParameters.vendor) {
-      queryParameters.vendor =
-        queryParameters.vendor === "all" ? "" : queryParameters.vendor;
-    }
-    if (queryParameters.category) {
-      queryParameters.category =
-        queryParameters.category === "all" ? "" : queryParameters.category;
-    }
+export const loader =
+  (store) =>
+  async ({ request }) => {
+    try {
+      store.dispatch(setIsLoadingtoTrue());
+      console.log(store.dispatch(setIsLoadingtoTrue()));
+      const url = new URL(request.url);
+      const queryParameters = Object.fromEntries(url.searchParams);
+      if (queryParameters.vendor) {
+        queryParameters.vendor =
+          queryParameters.vendor === "all" ? "" : queryParameters.vendor;
+      }
+      if (queryParameters.category) {
+        queryParameters.category =
+          queryParameters.category === "all" ? "" : queryParameters.category;
+      }
 
-    url.search = new URLSearchParams(queryParameters).toString();
-    console.log(url.search);
-    const response = await customFetch.get("/product" + url.search.toString());
-    console.log(response.data);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    return error.data;
-  }
-};
+      url.search = new URLSearchParams(queryParameters).toString();
+      console.log(url.search);
+      const response = await customFetch.get(
+        "/product" + url.search.toString()
+      );
+      store.dispatch(setIsLoadingtoFalse());
+      console.log(store.dispatch(setIsLoadingtoFalse()));
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      return error.data;
+    }
+  };
 
 const HomePage = () => {
   return (

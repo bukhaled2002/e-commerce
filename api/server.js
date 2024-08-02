@@ -14,7 +14,7 @@ const AppError = require("./utils/AppError");
 const blogSocket = require("./socket/blogSocket");
 const commentSocket = require("./socket/commentSocket");
 const orderRoute = require("./routes/orderRoute");
-const { completeOrder } = require("./controllers/orderController");
+const { completeOrder, webhook } = require("./controllers/orderController");
 const errorHandler = require("./controllers/errorHandling");
 
 // set Socket.io event listners
@@ -23,6 +23,7 @@ const io = socketIo(server);
 blogSocket(io);
 commentSocket(io);
 
+app.post("/webhook", express.raw({ type: "application/json" }), webhook);
 // set routes and middleware
 app.use(express.json({ limit: "10kb" }));
 app.use(

@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
 const initialState = {
-  user: { wishList: [] },
+  user: null,
+  loading: false,
 };
 
 export const userSlice = createSlice({
@@ -29,6 +30,12 @@ export const userSlice = createSlice({
         (item) => item !== action.payload
       );
     },
+    setIsLoadingtoTrue: (state) => {
+      state.loading = true;
+    },
+    setIsLoadingtoFalse: (state) => {
+      state.loading = false;
+    },
   },
 });
 
@@ -39,6 +46,8 @@ export const {
   addToWishlist,
   removeFromWishlist,
   updateProfile,
+  setIsLoadingtoFalse,
+  setIsLoadingtoTrue,
 } = userSlice.actions;
 
 export default userSlice.reducer;

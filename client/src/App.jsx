@@ -31,7 +31,7 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
-        loader: HomeLoader,
+        loader: HomeLoader(store),
         // action: filterAction,
       },
       {
@@ -50,7 +50,11 @@ const router = createBrowserRouter([
         element: <ProtectCustomerRoute />,
         children: [
           { path: "cart", element: <CartPage /> },
-          { path: "wishlist", element: <Wishlist />, loader: wishlistLoader },
+          {
+            path: "wishlist",
+            element: <Wishlist />,
+            loader: wishlistLoader(store),
+          },
         ],
       },
       {

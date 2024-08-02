@@ -14,7 +14,7 @@ function CartPage() {
       ) : (
         <div className="mt-16 mx-6 ">
           <p className="font-bold text-2xl capitalize">items found</p>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 mt-10">
             {/* <div className="gap-6"> */}
             {cart.items.map((item) => {
               const { id, title, totalPrice, quantity, images } = item;
