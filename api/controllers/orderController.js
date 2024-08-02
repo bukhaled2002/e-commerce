@@ -56,7 +56,6 @@ const createBookingCheckout = async (session) => {
     session.shipping_address_collection || "egypt hhaha";
   const total = session.amount_total || "card";
   const { id } = await User.findOne({ email: session.customer_email });
-  console.log(products);
   const obj = {
     products,
     customer: id,
@@ -65,7 +64,8 @@ const createBookingCheckout = async (session) => {
     shipping: { address: shipping_address_collection, price: shipping_cost },
     total,
   };
-  const order = await Order.create();
+  console.log(obj);
+  // const order = await Order.create();
 };
 exports.webhookCheckout = (req, res, next) => {
   const sig = req.headers["stripe-signature"];
