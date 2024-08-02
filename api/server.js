@@ -14,7 +14,10 @@ const AppError = require("./utils/AppError");
 const blogSocket = require("./socket/blogSocket");
 const commentSocket = require("./socket/commentSocket");
 const orderRoute = require("./routes/orderRoute");
-const { completeOrder, webhook } = require("./controllers/orderController");
+const {
+  completeOrder,
+  webhookCheckout,
+} = require("./controllers/orderController");
 const errorHandler = require("./controllers/errorHandling");
 
 // set Socket.io event listners
