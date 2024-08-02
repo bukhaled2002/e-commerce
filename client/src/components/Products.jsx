@@ -93,13 +93,14 @@ function Products() {
                 <div className="card-actions justify-end flex items-center mt-3">
                   <p className="text-primary">{price}$</p>
                   {user && user.role === "customer" && (
-                    <Link
+                    <button
                       className="btn btn-primary capitalize"
                       onClick={() =>
                         dispatch(
                           addToCart({
                             id: item.id,
                             title: name,
+                            description,
                             price: +price,
                             quantity: 1,
                             images: images,
@@ -108,7 +109,7 @@ function Products() {
                       }
                     >
                       add to cart
-                    </Link>
+                    </button>
                   )}
                 </div>
               </div>

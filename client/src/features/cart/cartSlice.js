@@ -23,6 +23,7 @@ export const cartSlice = createSlice({
           id: newItem.id,
           title: newItem.title,
           price: newItem.price,
+          description: newItem.description,
           totalPrice: newItem.price * newItem.quantity,
           quantity: newItem.quantity,
           images: newItem.images,
