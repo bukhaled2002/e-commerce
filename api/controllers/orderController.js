@@ -65,7 +65,7 @@ const createBookingCheckout = async (session) => {
     total,
   };
   console.log(obj);
-  // const order = await Order.create();
+  const order = await Order.create(obj);
 };
 exports.webhookCheckout = (req, res, next) => {
   const sig = req.headers["stripe-signature"];
