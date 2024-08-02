@@ -59,7 +59,7 @@ exports.webhook = async (req, res, next) => {
     );
     console.log(event.data.object);
   } catch {}
-  res.message("200");
+  res.json("200");
 };
 // exports.completeOrder = async (req, res, next) => {
 //   try {
