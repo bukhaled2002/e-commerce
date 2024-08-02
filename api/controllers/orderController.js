@@ -52,7 +52,12 @@ const createBookingCheckout = async (session) => {
 };
 exports.webhookCheckout = (req, res, next) => {
   const sig = req.headers["stripe-signature"];
-  console.log(sig);
+
+  // Check if the stripe-signature header is present
+  if (!sig) {
+    return res.status(400).send("Webhook Error: Stripe signature not found");
+  }
+
   let event;
   try {
     event = stripe.webhooks.constructEvent(
@@ -61,7 +66,7 @@ exports.webhookCheckout = (req, res, next) => {
       process.env.WEBHOOK_SECRET
     );
   } catch (err) {
-    return res.status(400).send(`Webhook Error ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === "checkout.session.completed")
