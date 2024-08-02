@@ -23,7 +23,11 @@ const io = socketIo(server);
 blogSocket(io);
 commentSocket(io);
 
-app.post("/webhook", express.raw({ type: "application/json" }), webhook);
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
 // set routes and middleware
 app.use(express.json({ limit: "10kb" }));
 app.use(
