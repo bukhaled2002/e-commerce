@@ -1,6 +1,7 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const Order = require("../models/Order");
 const User = require("../models/User");
+const AppError = require("../utils/AppError");
 exports.getCheckoutSession = async (req, res, next) => {
   try {
     const { cart, shippingAddress } = req.body;
@@ -91,17 +92,18 @@ exports.webhookCheckout = (req, res, next) => {
 
   res.status(200).json({ received: true });
 };
-// exports.completeOrder = async (req, res, next) => {
-//   try {
-//     res.status(200).json({
-//       status: "success",
-//       message: "Order completed successfully",
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(400).json({
-//       status: "fail",
-//       message: "Cannot complete payment, try again later",
-//     });
-//   }
-// };
+exports.getMyOrders = async (req, res, next) => {
+  try {
+    const myOrders = await Order.find({ customer: req.user.id });
+    res.status(200).json({
+      status: "success",
+      message: "your orders retrieved successfully",
+      orders: myOrders,
+    });
+    if (myOrder.length === 0) {
+      next(new AppError("No previous orders found"));
+    }
+  } catch (error) {
+    next(new AppError("cannot find your orders"));
+  }
+};
