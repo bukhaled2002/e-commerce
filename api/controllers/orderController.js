@@ -1,5 +1,6 @@
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
-
+const Order = require("../models/Order");
+const User = require("../models/User");
 exports.getCheckoutSession = async (req, res, next) => {
   try {
     const { cart, shippingAddress } = req.body;
@@ -48,7 +49,23 @@ exports.getCheckoutSession = async (req, res, next) => {
 };
 
 const createBookingCheckout = async (session) => {
-  console.log("session", session);
+  const products = JSON.parse(session.metadata.cart).map((item) => item.id);
+  const shipping_cost = session.shipping_cost || 100;
+  const payment_method_type = session.payment_method_types[0] || "card";
+  const shipping_address_collection =
+    session.shipping_address_collection || "egypt hhaha";
+  const total = session.amount_total || "card";
+  const { id } = await User.findOne({ email: session.customer_email });
+  console.log(products);
+  const obj = {
+    products,
+    customer: id,
+    payment: { paymentMethod: payment_method_type },
+    shipped: true,
+    shipping: { address: shipping_address_collection, price: shipping_cost },
+    total,
+  };
+  const order = await Order.create();
 };
 exports.webhookCheckout = (req, res, next) => {
   const sig = req.headers["stripe-signature"];
