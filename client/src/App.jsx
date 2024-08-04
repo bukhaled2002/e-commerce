@@ -21,6 +21,7 @@ import UpdateMyProduct, {
   action as updateProductAction,
   loader as updateLoader,
 } from "./pages/UpdateMyProduct";
+import Orders, { loader as orderloader } from "./pages/Orders";
 // import { action as filterAction } from "./components/FilterItems";
 const router = createBrowserRouter([
   {
@@ -54,6 +55,11 @@ const router = createBrowserRouter([
             path: "wishlist",
             element: <Wishlist />,
             loader: wishlistLoader(store),
+          },
+          {
+            path: "orders",
+            element: <Orders />,
+            loader: orderloader,
           },
         ],
       },

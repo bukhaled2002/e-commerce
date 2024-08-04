@@ -94,7 +94,10 @@ exports.webhookCheckout = (req, res, next) => {
 };
 exports.getMyOrders = async (req, res, next) => {
   try {
-    const myOrders = await Order.find({ customer: req.user.id });
+    const myOrders = await Order.find({ customer: req.user.id }).populate({
+      path: "products",
+      select: "name images",
+    });
     res.status(200).json({
       status: "success",
       message: "your orders retrieved successfully",
