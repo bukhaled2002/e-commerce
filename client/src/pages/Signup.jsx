@@ -6,8 +6,10 @@ import customFetch from "../utils/customFetch";
 import Cookies from "js-cookie";
 import { login } from "../features/user/userSlice";
 import Logo from "../assets/Logo";
+import { toast } from "react-toastify";
 const Signup = () => {
   const navigation = useNavigation();
+
   return (
     <section className="p-4 max-w-xl m-auto mt-5">
       <Logo />
@@ -19,7 +21,7 @@ const Signup = () => {
         <label className="input input-bordered flex items-center gap-2">
           <MdEmail />
           <input
-            type="text"
+            type="email"
             className="grow"
             placeholder="Email"
             name="email"
@@ -108,7 +110,7 @@ export const action =
       // console.log(response.data.data.user);
       return redirect("/");
     } catch (error) {
-      console.log(error);
+      toast.error("Invalid Credintials");
       return error?.response?.data || "null";
     }
   };

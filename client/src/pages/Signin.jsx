@@ -7,6 +7,7 @@ import { MdEmail } from "react-icons/md";
 import Cookies from "js-cookie";
 import { login } from "../features/user/userSlice";
 import GoogleAuth from "../components/GoogleAuth";
+import { toast } from "react-toastify";
 const Signin = () => {
   const navigation = useNavigation();
   return (
@@ -85,7 +86,7 @@ export const action =
       store.dispatch(login(response?.data?.data?.user));
       return redirect("/");
     } catch (error) {
-      console.log(error);
+      toast.error('Invalid Credintials')
       return error?.response?.data || null;
     }
   };

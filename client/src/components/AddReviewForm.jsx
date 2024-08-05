@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { Form, useLoaderData, useParams } from "react-router-dom";
 import customFetch from "../utils/customFetch";
+import { toast } from "react-toastify";
 
 // eslint-disable-next-line react/prop-types
 function AddReviewForm({ setNewReviewAdded }) {
@@ -21,7 +22,9 @@ function AddReviewForm({ setNewReviewAdded }) {
       });
       setReview({ rating: 5, comment: "" });
       setNewReviewAdded(true);
+      toast.success("review added successfully");
     } catch (error) {
+      toast.error("dont add empty review");
       console.log(error.response.data);
     }
   };
@@ -41,6 +44,7 @@ function AddReviewForm({ setNewReviewAdded }) {
               value={star}
               type="radio"
               name="rating-1"
+              min={5}
               className="mask mask-star bg-yellow-400"
             />
           );

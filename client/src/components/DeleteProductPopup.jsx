@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import customFetch from "../utils/customFetch";
 
 function DeleteProductPopup({ setPopup, productId }) {
@@ -6,7 +7,9 @@ function DeleteProductPopup({ setPopup, productId }) {
       const response = await customFetch.delete(`/product/${productId}`);
       console.log(response);
       setPopup(false);
+      toast.success("product deleted successfully");
     } catch (error) {
+      toast.error("cannot delete product");
       console.log(error);
     }
   };

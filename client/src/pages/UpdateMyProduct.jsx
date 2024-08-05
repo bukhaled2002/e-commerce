@@ -4,6 +4,7 @@ import { Form, redirect, useLoaderData } from "react-router-dom";
 import { uploadImage } from "../utils/uploadImage";
 import { useEffect, useRef, useState } from "react";
 import customFetch from "../utils/customFetch";
+import { toast } from "react-toastify";
 
 export const loader = async ({ params }) => {
   const response = await customFetch(`/product/${params.productId}`);
@@ -26,11 +27,7 @@ function UpdateMyProduct() {
       console.error("Error uploading image:", error);
     }
   };
-  useEffect(() => {
-    console.log("effect", image);
-    const x = document.getElementById("ss").childNodes[0].childNodes[1].value;
-    console.log(x);
-  }, [image]);
+
   const handleTags = (e) => {
     const value = e.target.value.split(" ");
     setTags(value);
@@ -105,6 +102,7 @@ function UpdateMyProduct() {
             type="text"
             className="grow"
             name="name"
+            minLength={8}
             defaultValue={product.name}
           />
         </label>
@@ -114,6 +112,7 @@ function UpdateMyProduct() {
             type="text"
             className="grow"
             name="description"
+            minLength={15}
             defaultValue={product.description}
           />
         </label>
@@ -197,9 +196,11 @@ export const action = async ({ request, params }) => {
       JSON.stringify(rest)
     );
 
+    toast.success("product edited successfully");
     return redirect("/vendor/myproducts");
   } catch (error) {
     console.log(error);
+    toast.success("cannot edit product");
     return null;
   }
 };

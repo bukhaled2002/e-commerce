@@ -4,6 +4,7 @@ import { Form, redirect } from "react-router-dom";
 import { uploadImage } from "../utils/uploadImage";
 import { useRef, useState } from "react";
 import customFetch from "../utils/customFetch";
+import { toast } from "react-toastify";
 
 function AddNewProduct() {
   const [tags, setTags] = useState([]);
@@ -93,11 +94,16 @@ function AddNewProduct() {
         </div>
         <label className="input input-bordered flex items-center gap-2">
           Name
-          <input type="text" className="grow" name="name" />
+          <input type="text" className="grow" name="name" minLength={8} />
         </label>
         <label className="input input-bordered flex items-center gap-2">
           Description
-          <input type="text" className="grow" name="description" />
+          <input
+            type="text"
+            className="grow"
+            name="description"
+            minLength={15}
+          />
         </label>
         <select
           name="category"
@@ -162,9 +168,11 @@ export const action = async ({ request }) => {
     console.log(rest);
     const response = await customFetch.post("product", JSON.stringify(rest));
     console.log(response);
+    toast.success("product added successfully");
     return redirect("/vendor/myproducts");
   } catch (error) {
     console.log(error);
+    toast.error("cannot add product");
     return null;
   }
 };
