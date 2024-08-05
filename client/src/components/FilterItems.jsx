@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { redirect, useLoaderData, useNavigate } from "react-router";
 import { Form, useSearchParams } from "react-router-dom";
@@ -10,7 +10,11 @@ function FilterItems({ setOpenFilterOptions }) {
   const categories = ["clothes", "smartphones", "accessories", "goods"];
   const vendors = [...new Set(data.map((item) => item.vendor.name))];
   const prices = [...new Set(data.map((item) => item.price))];
-  const maxPrice = Math.max(...prices);
+  const [maxPrice, setMaxPrice] = useState(
+    searchParams.get("maxPrice") || 2000
+  );
+
+  console.log(maxPrice);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -86,12 +90,15 @@ function FilterItems({ setOpenFilterOptions }) {
             </select>
           </label>
           <label className="flex col-span-2 flex-col gap-2">
-            price
+            price - {maxPrice}
             <input
               type="range"
               min={`0`}
-              max={maxPrice}
-              defaultValue={searchParams.get("maxPrice" || `${maxPrice}`)}
+              max={`2000`}
+              value={maxPrice}
+              onChange={(e) => {
+                setMaxPrice(e.target.value);
+              }}
               className="range range-xs"
               name="maxPrice"
             />
