@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 const customFetch = axios.create({
   baseURL: "https://e-commerce-1-a403.onrender.com/api/v1",
+  // baseURL: "http://localhost:3000/api/v1",
   headers: { "Content-Type": "application/json" },
 });
 customFetch.interceptors.request.use((config) => {

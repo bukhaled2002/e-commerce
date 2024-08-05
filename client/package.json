@@ -16,6 +16,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.7.2",
     "daisyui": "^4.12.10",
+    "dotenv": "^16.4.5",
     "firebase": "^9.22.0",
     "js-cookie": "^3.0.5",
     "preline": "^2.3.0",

@@ -16,7 +16,6 @@ export const loader = async () => {
 
 function Orders() {
   let { orders } = useLoaderData();
-  console.log(orders);
   //   const [data, setData] = useState(items);
   //   const [popup, setPopup] = useState(false);
   //   const [productId, setProductId] = useState(null);
@@ -49,7 +48,6 @@ function Orders() {
           {/* row 1 */}
           {orders.map((order) => {
             const { id, shipping, total, payment, shipped } = order;
-            console.log("from table", id);
             return (
               <tr key={id}>
                 <td>
