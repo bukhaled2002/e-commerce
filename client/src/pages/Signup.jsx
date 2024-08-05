@@ -1,91 +1,59 @@
-import { FaShopware } from "react-icons/fa6";
-import { Form, Link, redirect } from "react-router-dom";
+import { FaKey, FaUser } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+
+import { Form, Link, redirect, useNavigation } from "react-router-dom";
 import customFetch from "../utils/customFetch";
 import Cookies from "js-cookie";
 import { login } from "../features/user/userSlice";
+import Logo from "../assets/Logo";
 const Signup = () => {
+  const navigation = useNavigation();
   return (
-    <section className="p-4 max-w-xl m-auto ">
-      <div className="logo  m-auto w-fit flex justify-center items-center flex-col">
-        <FaShopware className=" mt-10 text-purple-400 text-6xl" />
-        <h1 className="text-white text-2xl font-semibold">
-          Wo<span className="text-purple-400 font-bold">OSH</span>op
-        </h1>
-      </div>
-      <h2 className="text-center font-semibold text-3xl dark:text-white text-neutral-800 mt-3">
-        Signup
-      </h2>
+    <section className="p-4 max-w-xl m-auto mt-5">
+      <Logo />
+      <h2 className="text-center font-semibold text-3xl mt-3">Signup</h2>
       <Form
         method="POST"
         className="flex flex-col justify-center mx-16 mt-5 gap-4"
       >
-        <div className="max-w-full">
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Name
-          </label>
+        <label className="input input-bordered flex items-center gap-2">
+          <MdEmail />
           <input
             type="text"
-            id="name"
-            name="name"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            placeholder="John doe"
-          />
-        </div>
-        <div className="max-w-full">
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
+            className="grow"
+            placeholder="Email"
             name="email"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            placeholder="example@gmail.com"
           />
-        </div>
-        <div className="max-w-full">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Password
-          </label>
+        </label>
+        <label className="input input-bordered flex items-center gap-2">
+          <FaUser />
+          <input type="text" className="grow" placeholder="Name" name="name" />
+        </label>
+        <label className="input input-bordered flex items-center gap-2">
+          <FaKey />
           <input
             type="password"
-            id="password"
+            className="grow"
             name="password"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            placeholder="*********"
+            placeholder="password"
           />
-        </div>
-        <div className="max-w-full">
-          <label
-            htmlFor="passwordConfirm"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Password Confirm
-          </label>
+        </label>
+        <label className="input input-bordered flex items-center gap-2">
+          <FaKey />
           <input
             type="password"
+            className="grow"
             name="passwordConfirm"
-            id="passwordConfirm"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            placeholder="*********"
+            placeholder="confirm password"
           />
-        </div>
+        </label>
         <select
           name="role"
-          className="btn bg-slate-700 z-[1] shadow rounded-xl"
+          className="btn bg-slate-700 text-neutral-50 z-[1] shadow rounded-xl"
         >
           <option
             value="customer"
-            className="btn bg-[#79899d52] text-white my-1 rounded-full min-h-10 h-10 border-none hover:bg-primary"
+            className="btn  bg-[#79899d52] text-white  my-1 rounded-full min-h-10 h-10 border-none hover:bg-primary"
           >
             customer
           </option>
@@ -96,8 +64,19 @@ const Signup = () => {
             vendor
           </option>
         </select>
-        <button type="submit" className="bg-primary text-white h-10 rounded-lg">
-          sign up
+        <button
+          disabled={navigation.state === "loading"}
+          type="submit"
+          className="btn btn-primary text-primary-content capitalize"
+        >
+          {navigation.state === "loading" ? (
+            <>
+              <span className="loading-spinner" />
+              loading
+            </>
+          ) : (
+            "signup"
+          )}
         </button>
         <p className="ml-1">
           Already have acount?
@@ -115,8 +94,8 @@ export const action =
     try {
       const formData = await request.formData();
       const formDataObj = Object.fromEntries(formData);
-      // Process the form data here
       console.log(formDataObj);
+      // Process the form data here
       const response = await customFetch.post(
         "/user/signup",
         JSON.stringify(formDataObj)
@@ -130,7 +109,7 @@ export const action =
       return redirect("/");
     } catch (error) {
       console.log(error);
-      return error?.response?.data || null;
+      return error?.response?.data || "null";
     }
   };
 export default Signup;

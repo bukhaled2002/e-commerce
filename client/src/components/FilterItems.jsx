@@ -7,11 +7,10 @@ function FilterItems({ setOpenFilterOptions }) {
   const { data } = useLoaderData();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const categories = [...new Set(data.map((item) => item.category))];
+  const categories = ["clothes", "smartphones", "accessories", "goods"];
   const vendors = [...new Set(data.map((item) => item.vendor.name))];
   const prices = [...new Set(data.map((item) => item.price))];
   const maxPrice = Math.max(...prices);
-  const minPrice = Math.min(...prices);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,10 +28,10 @@ function FilterItems({ setOpenFilterOptions }) {
   };
   return (
     <>
-      <div className="fixed inset-0 bg-black opacity-30 z-[3]" />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 md:w-[500px] md:max-w-screen-md bg-slate-800 flex items-center justify-center rounded-xl z-[5] py-5">
+      <div className="fixed inset-0 bg-black opacity-40 z-[3]" />
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 md:w-[500px] md:max-w-screen-md bg-base-200 flex items-center justify-center rounded-xl z-[5] py-5">
         <button
-          className="absolute top-1 right-3 font-bold text-slate-200 cursor-pointer text-xl"
+          className="absolute top-1 right-3 font-bold  cursor-pointer text-xl"
           onClick={() => {
             setOpenFilterOptions(false);
           }}
@@ -70,7 +69,7 @@ function FilterItems({ setOpenFilterOptions }) {
             </select>
           </label>
           <label className="flex flex-col gap-2">
-            vendor
+            Vendor
             <select
               className="select select-md select-bordered max-w-xs"
               name="vendor"

@@ -1,15 +1,32 @@
 import NavLogo from "../assets/NavLogo";
-import { FaSearch, FaRegHeart, FaRegMoon } from "react-icons/fa";
+import { FaRegHeart, FaRegMoon } from "react-icons/fa";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { FiSun } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, redirect } from "react-router-dom";
 import { logout } from "../features/user/userSlice";
+import { useEffect, useState } from "react";
+const themes = {
+  sunset: "sunset",
+  nord: "nord",
+};
 function Header() {
   const user = useSelector((state) => state.user.user);
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const [theme, setTheme] = useState(localStorage.getItem("theme"));
+
+  const handleTheme = () => {
+    const { nord, sunset } = themes;
+    const newTheme = theme === sunset ? nord : sunset;
+    setTheme(newTheme);
+  };
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const handleSignout = async () => {
     try {
@@ -66,7 +83,7 @@ function Header() {
           <input
             type="checkbox"
             className="theme-controller"
-            value="synthwave"
+            onChange={handleTheme}
           />
           {/* sun icon */}
           <FiSun className="swap-off" />
@@ -97,8 +114,13 @@ function Header() {
                 <li>
                   <Link to={"/updateProfile"}>update profile</Link>
                 </li>
+                {user.role === "customer" && (
+                  <li>
+                    <Link to={"/customer/orders"}>My Orders</Link>
+                  </li>
+                )}
                 <li onClick={handleSignout}>
-                  <a href="">Sign out</a>
+                  <button>Sign out</button>
                 </li>
               </>
             ) : (

@@ -42,7 +42,7 @@ function GoogleAuth() {
     <button
       onClick={() => handleGoogleAuth()}
       type="button"
-      className="btn bg-red-600 text-white"
+      className="btn btn-secondary "
     >
       GoogleAuth
     </button>

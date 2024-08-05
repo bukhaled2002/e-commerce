@@ -1,12 +1,16 @@
-import { Form, Link, redirect } from "react-router-dom";
+import { Form, Link, redirect, useNavigation } from "react-router-dom";
 import customFetch from "../utils/customFetch";
 import Logo from "../assets/Logo";
+import { FaKey } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+
 import Cookies from "js-cookie";
 import { login } from "../features/user/userSlice";
 import GoogleAuth from "../components/GoogleAuth";
 const Signin = () => {
+  const navigation = useNavigation();
   return (
-    <section className="p-4 max-w-xl m-auto ">
+    <section className="p-4 max-w-xl m-auto mt-20">
       <Logo />
       <h2 className="text-center font-semibold text-3xl dark:text-white text-neutral-800 mt-3">
         Signin
@@ -15,50 +19,45 @@ const Signin = () => {
         method="POST"
         className="flex flex-col justify-center mx-16 mt-5 gap-4"
       >
-        <div className="max-w-full">
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Email
-          </label>
+        <label className="input input-bordered flex items-center gap-2">
+          <MdEmail />
           <input
             type="email"
-            id="email"
+            className="grow"
+            placeholder="Email"
             name="email"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            placeholder="example@gmail.com"
           />
-          {/* <input type="file" ref={ref} />
-          <button onClick={handlePhoto}> ss</button> */}
-        </div>
-        <div className="max-w-full">
-          <label
-            htmlFor="password"
-            className="block text-sm font-medium mb-2 dark:text-white"
-          >
-            Password
-          </label>
+        </label>
+
+        <label className="input input-bordered flex items-center gap-2">
+          <FaKey />
           <input
             type="password"
-            id="password"
+            className="grow"
             name="password"
-            className="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
-            placeholder="*********"
+            placeholder="Password"
           />
-        </div>
+        </label>
         <p className="ml-1">
           dont have acount?
-          <Link to={"/signup"} className="text-purple-500 ml-2">
+          <Link to={"/signup"} className="text-primary ml-2">
             signup
           </Link>
         </p>
 
         <button
+          disabled={navigation.state === "loading"}
           type="submit"
-          className="bg-purple-600 text-white h-10 rounded-lg"
+          className="btn btn-primary text-primary-content capitalize"
         >
-          signin
+          {navigation.state === "loading" ? (
+            <>
+              <span className="loading-spinner" />
+              loading
+            </>
+          ) : (
+            "signin"
+          )}
         </button>
         <GoogleAuth />
       </Form>
@@ -73,6 +72,8 @@ export const action =
       const formData = await request.formData();
       const formDataObj = Object.fromEntries(formData);
       // Process the form data here
+      console.log(formDataObj);
+
       const response = await customFetch.post(
         "/user/signin",
         JSON.stringify(formDataObj)

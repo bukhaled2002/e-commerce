@@ -12,8 +12,9 @@ export default {
   ],
 
   // enable dark mode via class strategy
-  darkMode: "class",
-
+  daisyui: {
+    themes: ["nord", "sunset"],
+  },
   theme: {
     extend: {},
   },

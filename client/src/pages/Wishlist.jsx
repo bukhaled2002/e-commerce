@@ -1,7 +1,7 @@
 import Products from "../components/Products";
 import customFetch from "../utils/customFetch";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 import {
   setIsLoadingtoFalse,
   setIsLoadingtoTrue,
@@ -15,7 +15,7 @@ export const loader = (store) => async () => {
     return response.data;
   } catch (error) {
     console.log(error);
-    // return redirect("/");
+    return redirect("/");
   }
 };
 

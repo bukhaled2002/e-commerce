@@ -6,9 +6,9 @@ function Logo() {
     <div
       className={`logo  m-auto w-fit flex justify-center items-center flex-col`}
     >
-      <FaShopware className=" mt-10 text-purple-400 text-6xl" />
-      <h1 className="text-white text-2xl font-semibold">
-        Wo<span className="text-purple-400 font-bold">OSH</span>op
+      <FaShopware className=" mt-10 text-primary text-6xl" />
+      <h1 className="text-2xl font-semibold">
+        Wo<span className="text-primary font-bold">OSH</span>op
       </h1>
     </div>
   );
