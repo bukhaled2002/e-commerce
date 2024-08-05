@@ -63,7 +63,7 @@ exports.getAllProducts = async (req, res, next) => {
       });
       query.sort(sortFields);
     } else {
-      query.sort({ price: 1 });
+      query.sort({ createdAt: -1 });
     }
 
     query.skip((page - 1) * limit).limit(limit);

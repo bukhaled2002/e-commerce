@@ -90,7 +90,7 @@ function FilterItems({ setOpenFilterOptions }) {
             <input
               type="range"
               min={`0`}
-              max={`10000`}
+              max={maxPrice}
               defaultValue={searchParams.get("maxPrice" || `${maxPrice}`)}
               className="range range-xs"
               name="maxPrice"
