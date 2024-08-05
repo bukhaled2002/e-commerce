@@ -1,4 +1,4 @@
-#E-Commerce MERN Application#
+E-Commerce MERN Application
 Overview
 This project is a full-stack e-commerce application built using the MERN (MongoDB, Express, React, Node.js) stack. The application provides a robust set of features for both customers and vendors, allowing for a seamless online shopping experience.
 
@@ -27,3 +27,5 @@ Node.js and Express.js for the server-side logic
 Mongoose for interacting with the MongoDB database
 Firebase Storage for secure file uploads
 JSON Web Tokens (JWT) for authentication
+Deployment
+The application is deployed on Render.com
