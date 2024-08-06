@@ -54,11 +54,20 @@ export const cartSlice = createSlice({
       state.totalQuantity -= itemToRemove.quantity;
       state.items = state.items.filter((item) => item.id !== action.payload.id);
     },
+    removeEntireCart: (state) => {
+      state.items = [];
+      state.totalAmount = 0;
+      state.totalQuantity = 0;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { addToCart, removeItemFromCart, removeEntireItemFromCart } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  removeItemFromCart,
+  removeEntireItemFromCart,
+  removeEntireCart,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;

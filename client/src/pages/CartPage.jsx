@@ -1,13 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
-import { removeEntireItemFromCart } from "../features/cart/cartSlice";
+import {
+  removeEntireCart,
+  removeEntireItemFromCart,
+} from "../features/cart/cartSlice";
 import customFetch from "../utils/customFetch";
-import { useNavigate } from "react-router";
 
 function CartPage() {
   const cart = useSelector((state) => state.cart);
-  console.log(cart);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const handleCheckout = async () => {
     try {
       const itemToBuy = {
@@ -29,6 +29,7 @@ function CartPage() {
       );
       console.log(response);
       window.open(response.data.session.url);
+      dispatch(removeEntireCart());
     } catch (error) {
       console.log(error);
     }
