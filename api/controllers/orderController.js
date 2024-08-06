@@ -34,7 +34,11 @@ exports.getCheckoutSession = async (req, res, next) => {
       cancel_url: `https://e-commerce-frontend-2s7i.onrender.com`,
       customer_email: req.user.email,
       shipping_address: shippingAddress,
-      metadata: { cart: JSON.stringify(cart) },
+      metadata: {
+        cart: JSON.stringify(
+          cart.map((item) => ({ item: item.id, quantity: item.quantity }))
+        ),
+      },
     });
     res.status(200).json({
       status: "success",
@@ -53,6 +57,8 @@ exports.getCheckoutSession = async (req, res, next) => {
 
 const createBookingCheckout = async (session) => {
   const products = JSON.parse(session.metadata.cart).map((item) => item.id);
+  console.log(products);
+
   const shipping_cost = session.shipping_cost || 100;
   const payment_method_type = session.payment_method_types[0] || "card";
   const shipping_address_collection =
