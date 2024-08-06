@@ -35,11 +35,15 @@ exports.getCheckoutSession = async (req, res, next) => {
       customer_email: req.user.email,
       shipping_address: shippingAddress,
       metadata: {
-        cart: JSON.stringify(
-          cart.map((item) => ({ item: item.id, quantity: item.quantity }))
-        ),
+        cart: JSON.stringify({
+          cart: cart.map((item) => ({
+            id: item.id,
+            quantity: item.quantity,
+          })),
+        }),
       },
     });
+
     res.status(200).json({
       status: "success",
       session,
@@ -56,7 +60,9 @@ exports.getCheckoutSession = async (req, res, next) => {
 };
 
 const createBookingCheckout = async (session) => {
-  const products = JSON.parse(session.metadata).cart.map((item) => item.id);
+  const products = JSON.parse(session.metadata.cart).cart.map(
+    (item) => item.id
+  );
   console.log("products", products);
 
   const shipping_cost = session.shipping_cost || 100;
