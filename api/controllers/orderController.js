@@ -42,8 +42,10 @@ exports.getCheckoutSession = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+    // next(new AppError("cannot complete payment",404))
     res.status(400).json({
       status: "fail",
+      error,
       message: "cannot complete payment, try again later",
     });
   }
