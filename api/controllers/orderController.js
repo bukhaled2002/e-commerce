@@ -56,14 +56,14 @@ exports.getCheckoutSession = async (req, res, next) => {
 };
 
 const createBookingCheckout = async (session) => {
-  const products = JSON.parse(session.metadata.cart).map((item) => item.id);
-  console.log(products);
+  const products = JSON.parse(session.metadata).cart.map((item) => item.id);
+  console.log("products", products);
 
   const shipping_cost = session.shipping_cost || 100;
   const payment_method_type = session.payment_method_types[0] || "card";
   const shipping_address_collection =
     session.shipping_address_collection || "egypt hhaha";
-  const total = session.amount_total || "card";
+  const total = session.amount_total / 100 || 200;
   const { id } = await User.findOne({ email: session.customer_email });
   const obj = {
     products,
