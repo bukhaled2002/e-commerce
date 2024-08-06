@@ -4,8 +4,10 @@ import {
   removeEntireItemFromCart,
 } from "../features/cart/cartSlice";
 import customFetch from "../utils/customFetch";
+import { useNavigate } from "react-router";
 
 function CartPage() {
+  const navigate = useNavigate();
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const handleCheckout = async () => {
@@ -28,7 +30,8 @@ function CartPage() {
         itemToBuy
       );
       console.log(response);
-      window.open(response.data.session.url);
+      // window.location.href = response.data.session.url;
+      navigate(response.data.session.url);
       dispatch(removeEntireCart());
     } catch (error) {
       console.log(error);
