@@ -12,7 +12,6 @@ export const loader =
   async ({ request }) => {
     try {
       store.dispatch(setIsLoadingtoTrue());
-      console.log(store.dispatch(setIsLoadingtoTrue()));
       const url = new URL(request.url);
       const queryParameters = Object.fromEntries(url.searchParams);
       if (queryParameters.vendor) {
@@ -25,12 +24,11 @@ export const loader =
       }
 
       url.search = new URLSearchParams(queryParameters).toString();
-      console.log(url.search);
+
       const response = await customFetch.get(
         "/product" + url.search.toString()
       );
       store.dispatch(setIsLoadingtoFalse());
-      console.log(store.dispatch(setIsLoadingtoFalse()));
       return response.data;
     } catch (error) {
       console.log(error);

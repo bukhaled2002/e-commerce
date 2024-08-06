@@ -22,7 +22,7 @@ function Products() {
   const handleRemoveFromWishlist = async (id) => {
     await customFetch.delete("/product/wishlist/" + id);
     dispatch(removeFromWishlist(id));
-    toast.success("product removed from wishlist");
+    toast.warn("product removed from wishlist");
   };
 
   if (loading === true) {
@@ -98,7 +98,7 @@ function Products() {
                   {user && user.role === "customer" && (
                     <button
                       className="btn btn-primary capitalize"
-                      onClick={() =>
+                      onClick={() => {
                         dispatch(
                           addToCart({
                             id: item.id,
@@ -108,8 +108,9 @@ function Products() {
                             quantity: 1,
                             images: images,
                           })
-                        )
-                      }
+                        );
+                        toast.success("product added to cart");
+                      }}
                     >
                       add to cart
                     </button>

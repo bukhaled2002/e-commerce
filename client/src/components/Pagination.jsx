@@ -4,9 +4,7 @@ function Pagination() {
   const { totalPages, currentPage } = useLoaderData();
   const data = useLoaderData();
   const navigate = useNavigate();
-  console.log(data);
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  console.log(pages);
   const handlePageChange = (page) => {
     // Update the URL with the new page number
     const url = location.search;
@@ -22,6 +20,7 @@ function Pagination() {
     <>
       <div className="join flex justify-center">
         {pages.map((page) => {
+          console.log(+currentPage, +page);
           console.log(+currentPage === +page);
           return (
             <input
@@ -30,8 +29,7 @@ function Pagination() {
               type="radio"
               name="options"
               aria-label={page}
-              value={page}
-              defaultChecked={+currentPage === +page}
+              checked={+currentPage === +page}
               onChange={() => handlePageChange(page)}
             />
           );

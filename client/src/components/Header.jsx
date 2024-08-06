@@ -36,7 +36,6 @@ function Header() {
       console.error("Error during logout:", error);
     }
   };
-  console.log(user);
   return (
     <header className="flex pt-5 px-5 items-center justify-between md:px-16 sm:10 lg:px28 gap-3">
       <NavLogo />
