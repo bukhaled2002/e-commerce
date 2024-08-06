@@ -31,7 +31,7 @@ function CartPage() {
       );
       console.log(response);
       // window.location.href = response.data.session.url;
-      navigate(response.data.session.url);
+      navigate(response.data.session.url, { replace: true });
       dispatch(removeEntireCart());
     } catch (error) {
       console.log(error);
