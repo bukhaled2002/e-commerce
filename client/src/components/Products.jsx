@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "../features/user/userSlice";
 import { addToCart } from "../features/cart/cartSlice";
 import Pagination from "./Pagination";
+import { toast } from "react-toastify";
 
 function Products() {
   const { user, loading } = useSelector((state) => state.user);
@@ -16,10 +17,12 @@ function Products() {
     console.log("add");
     await customFetch.post("/product/wishlist/" + id);
     dispatch(addToWishlist(id));
+    toast.success("product added to wishlist");
   };
   const handleRemoveFromWishlist = async (id) => {
     await customFetch.delete("/product/wishlist/" + id);
     dispatch(removeFromWishlist(id));
+    toast.success("product removed from wishlist");
   };
 
   if (loading === true) {
