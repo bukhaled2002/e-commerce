@@ -64,7 +64,7 @@ function CartPage() {
                         images ||
                         "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
                       }
-                      className="min-w-32 w-60 h-40 object-cover col-span-1 rounded-xl"
+                      className="min-w-11 h-24 sm:min-w-32 w-60 sm:h-40 object-cover col-span-1 rounded-xl"
                     />
                     {/* detail  */}
                     <div className="font-bold text-lg capitalize ml-4  mt-5">
